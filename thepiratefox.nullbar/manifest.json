@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "thepiratefox.nullbar",
+  "name": "Null bar",
+  "version": "1.0.0",
+  "license": "MIT",
+  "description": "A bar that draws nothing and reserves nothing, so a second shell (Caelestia) can own the screen edge. Omarchy's bar cannot be disabled, only replaced -- this is the replacement. Select it with \"bar\": { \"id\": \"thepiratefox.nullbar\" } in ~/.config/omarchy/shell.json; remove that line to get the built-in bar back.",
+  "kinds": [
+    "bar"
+  ],
+  "entryPoints": {
+    "bar": "Bar.qml"
+  }
+}

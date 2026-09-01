@@ -1,0 +1,18 @@
+[Unit]
+Description=Keep org.freedesktop.Notifications owned by Omarchy's shell
+Documentation=https://github.com/EugeneTuaev/caelestia-shell-to-omarchy
+# Deliberately independent of caelestia-shell.service: the guard is useful while
+# Caelestia is down, and it is what repairs the bus after `omarchy restart shell`.
+After=graphical-session.target
+PartOf=graphical-session.target
+ConditionEnvironment=WAYLAND_DISPLAY
+
+[Service]
+Type=simple
+ExecStart=%h/.config/omarchy/bridges/caelestia/caelestia-notif-guard
+# A pure daemon: it should never exit. Same shape as omarchy-crash-watch.
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=graphical-session.target

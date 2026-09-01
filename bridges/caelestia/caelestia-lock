@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# Lock the session with Caelestia's lock screen.
+#
+# Replaces omarchy-system-lock on this machine: the same housekeeping, a
+# different lock surface. Both SUPER + CTRL + L and Caelestia's own idle
+# timeout (general.idle.timeouts in ~/.config/caelestia/shell.json) call this,
+# so a timed lock and a manual lock behave identically.
+#
+# Why the housekeeping lives here rather than being left to Caelestia:
+#
+#   layout      Caelestia's lock renders the password prompt in whatever
+#               keyboard layout is active, and says so. With a second layout
+#               configured it will happily show you "Kb layout: Russian" -- at
+#               which point the password cannot be typed. omarchy-system-lock
+#               reset the layout; nothing in Caelestia does. Harmless if you
+#               only have one layout.
+#
+#   screensaver Omarchy's screensaver keeps running underneath Caelestia's
+#               lock surface. omarchy-system-lock killed it;
+#               omarchy-system-wake only restores brightness.
+#
+# omarchy-system-lock also locks 1Password if it is installed. That part is
+# dropped rather than copied -- add it back here if you use it.
+
+set -u
+
+PREFIX="$HOME/.local/share/caelestia-shell"
+
+# Type the password in the layout it was set in. 0 is the first layout (us).
+hyprctl switchxkblayout all 0 >/dev/null 2>&1
+
+# ttfx handles SIGTERM asynchronously, so keep its terminal alive until it exits.
+pkill -x ttfx 2>/dev/null || true
+timeout 1s pidwait -x ttfx 2>/dev/null || true
+pkill -f '[o]rg.omarchy.screensaver' 2>/dev/null || true
+
+# Fall back to Omarchy's lock if Caelestia is not answering: a lock key that
+# silently does nothing is worse than the wrong lock screen.
+qs -p "$PREFIX/qs" ipc call lock lock || omarchy-system-lock

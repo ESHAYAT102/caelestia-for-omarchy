@@ -1,0 +1,22 @@
+[Unit]
+Description=Caelestia shell, layered on top of Omarchy's shell
+Documentation=https://github.com/EugeneTuaev/caelestia-shell-to-omarchy
+# Needs the compositor and the session bus. caelestia-start additionally waits
+# for Omarchy's shell to own org.freedesktop.Notifications before launching --
+# start Caelestia into that gap and it wins the name, which silently breaks the
+# crash-diagnosis toast.
+After=graphical-session.target
+PartOf=graphical-session.target
+ConditionEnvironment=WAYLAND_DISPLAY
+
+[Service]
+Type=simple
+ExecStart=%h/.config/omarchy/bridges/caelestia/caelestia-start
+# on-failure, not always: caelestia-start exits 0 when Caelestia is already
+# running, and `always` would turn that into a slow restart loop. A crash or a
+# kill is a failure and does get restarted.
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=graphical-session.target

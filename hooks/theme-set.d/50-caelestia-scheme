@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Caelestia follows Omarchy's theme.
+# $1 is the theme slug omarchy-theme-set has just applied.
+#
+# The bridge only writes ~/.local/state/caelestia/scheme.json, which Caelestia
+# watches. It never talks to Caelestia, so this works the same whether Caelestia
+# is running or not, and a fresh start picks the file up on its own.
+
+exec "$HOME/.config/omarchy/bridges/caelestia/omarchy-to-caelestia-scheme" "$1"

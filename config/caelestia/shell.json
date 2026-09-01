@@ -1,0 +1,28 @@
+{
+  "background": { "enabled": false, "wallpaperEnabled": false },
+  "lock": { "enabled": true },
+  "session": { "enabled": true },
+  "general": {
+    "idle": {
+      "timeouts": [
+        { "timeout": 310, "idleAction": ["__HOME__/.config/omarchy/bridges/caelestia/caelestia-lock"] }
+      ],
+      "lockBeforeSleep": false,
+      "inhibitWhenAudio": false
+    }
+  },
+  "bar": {
+    "activeWindow": { "compact": true },
+    "statusIcons": [
+      { "id": "kbLayout",   "enabled": true },
+      { "id": "audio",      "enabled": true },
+      { "id": "microphone", "enabled": false },
+      { "id": "lockStatus", "enabled": true },
+      { "id": "network",    "enabled": true },
+      { "id": "bluetooth",  "enabled": true },
+      { "id": "battery",    "enabled": false }
+    ]
+  },
+  "services": { "useFahrenheit": false },
+  "appearance": { "font": { "body": { "small": { "size": 15 } } } }
+}

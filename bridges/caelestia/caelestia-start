@@ -1,0 +1,50 @@
+#!/bin/bash
+
+# Start Caelestia layered on top of Omarchy's shell.
+#
+# The one place that knows how to launch Caelestia. caelestia-notif-guard calls
+# it to repair the notification bus, Hyprland's autostart calls it at login, and
+# it is the command to run by hand. Idempotent: a second call is a no-op.
+#
+# Three env vars are mandatory. Caelestia is built into a private prefix so it
+# cannot disturb Omarchy's quickshell package, which means nothing is on the
+# default QML import path.
+
+set -uo pipefail
+
+readonly PREFIX="$HOME/.local/share/caelestia-shell"
+readonly OMARCHY_SHELL="/usr/share/omarchy/shell"
+readonly BRIDGE="$HOME/.config/omarchy/bridges/caelestia/omarchy-to-caelestia-scheme"
+
+omarchy_owns_notification_bus() {
+  busctl --user status org.freedesktop.Notifications 2>/dev/null |
+    grep -q "^CommandLine=.*$OMARCHY_SHELL"
+}
+
+if pgrep -f "quickshell -n -p $PREFIX/qs" >/dev/null 2>&1; then
+  echo "caelestia-start: already running" >&2
+  exit 0
+fi
+
+# Omarchy must hold org.freedesktop.Notifications BEFORE Caelestia starts.
+# Quickshell requests the name without REPLACE_EXISTING, so whoever asks first
+# keeps it -- and if Caelestia wins, the crash toast still appears but its click
+# does nothing, because the command rides in an omarchy-exec-argv hint only
+# Omarchy's shell reads. omarchy-notification-wait is not enough on its own: it
+# only proves *someone* answers GetServerInformation.
+for _ in $(seq 1 150); do
+  omarchy_owns_notification_bus && break
+  sleep 0.2
+done
+omarchy_owns_notification_bus ||
+  echo "caelestia-start: WARNING omarchy does not own the notification bus" >&2
+
+# Pick up the current Omarchy theme. A theme set while Caelestia was down has
+# already written scheme.json, so this only matters when something changed the
+# theme without firing the theme-set hook.
+"$BRIDGE" || true
+
+exec env QML2_IMPORT_PATH="$PREFIX/qml" \
+         QML_IMPORT_PATH="$PREFIX/qml" \
+         CAELESTIA_LIB_DIR="$PREFIX/lib" \
+     quickshell -n -p "$PREFIX/qs"

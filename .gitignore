@@ -1,0 +1,7 @@
+# Nothing generated lives here. Listed so an accidental local copy of the
+# author's private build record can never be committed by mistake.
+backup/
+LOG.md
+state.md
+plan.md
+*.bak.*

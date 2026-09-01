@@ -1,0 +1,91 @@
+#!/bin/bash
+
+# Keep org.freedesktop.Notifications owned by Omarchy's shell.
+#
+# THE RACE THIS CLOSES
+#   `omarchy restart shell` (routine -- `omarchy update` does it) makes Omarchy
+#   release the notification bus name. Caelestia's Quickshell has been sitting
+#   in the bus queue since it started, so it acquires the name in that gap. The
+#   new omarchy-shell then loses and waits.
+#
+#   Nothing looks broken: toasts still appear, rendered by Caelestia. But the
+#   crash toast carries an EMPTY freedesktop actions array -- its click command
+#   rides in the private `omarchy-exec-argv` hint that only Omarchy's shell
+#   reads. So the "Process crashed / Click to diagnose with AI" toast becomes
+#   inert, silently. That is the one thing this migration may not break.
+#
+# WHY SUPERVISION AND NOT CONFIGURATION
+#   Quickshell's NotificationServer has no property to suppress registration
+#   (checked against the installed 0.3.1 type info) and Caelestia's
+#   modules/ServiceLoader.qml instantiates Notifs unconditionally, with no
+#   config key behind it. There is nothing to switch off. Restarting Caelestia
+#   after the fact is the only lever that does not mean patching Caelestia.
+#
+# Event-driven: one dbus match rule, no polling, idle at 0% CPU -- Phase 7
+# forbids a poll loop.
+
+set -uo pipefail
+
+readonly PREFIX="$HOME/.local/share/caelestia-shell"
+readonly OMARCHY_SHELL="/usr/share/omarchy/shell"
+readonly START="$HOME/.config/omarchy/bridges/caelestia/caelestia-start"
+
+# A restart produces a burst of NameOwnerChanged (release, then re-acquire).
+# Let it settle before deciding, so one restart is not read as several.
+readonly settle_seconds=${CAELESTIA_GUARD_SETTLE:-1}
+
+log() { printf 'caelestia-notif-guard: %s\n' "$*" >&2; }
+
+bus_owner() {
+  busctl --user status org.freedesktop.Notifications 2>/dev/null |
+    sed -n 's/^CommandLine=//p'
+}
+
+caelestia_running() {
+  pgrep -f "quickshell -n -p $PREFIX/qs" >/dev/null 2>&1
+}
+
+repair() {
+  log "Caelestia holds the notification bus -- restarting it so Omarchy reclaims it"
+
+  # Under systemd, let the unit do the restart. Killing it here as well would
+  # race with Restart= and leave two Caelestias.
+  if systemctl --user is-active --quiet caelestia-shell.service 2>/dev/null; then
+    systemctl --user restart caelestia-shell.service
+    return
+  fi
+
+  pkill -f "quickshell -n -p $PREFIX/qs"
+  for _ in $(seq 1 50); do
+    caelestia_running || break
+    sleep 0.1
+  done
+  caelestia_running && pkill -9 -f "quickshell -n -p $PREFIX/qs"
+
+  # caelestia-start blocks until Omarchy owns the name again before launching,
+  # which is what keeps this from handing the bus straight back.
+  setsid "$START" >/dev/null 2>&1 &
+
+  # No retry loop and no backoff on purpose: NameOwnerChanged only fires when
+  # ownership actually changes, so a state that stays broken produces no further
+  # events and this cannot spin.
+}
+
+log "watching org.freedesktop.Notifications (owner: $(bus_owner))"
+
+dbus-monitor --session \
+  "type='signal',interface='org.freedesktop.DBus',member='NameOwnerChanged',arg0='org.freedesktop.Notifications'" \
+  2>/dev/null |
+  while IFS= read -r line; do
+    [[ $line == *member=NameOwnerChanged* ]] || continue
+
+    sleep "$settle_seconds"
+    owner=$(bus_owner)
+
+    case "$owner" in
+      *"$OMARCHY_SHELL"*) : ;;                       # correct, nothing to do
+      *"$PREFIX/qs"*)     repair ;;
+      "")                 log "notification bus is unowned" ;;
+      *)                  log "notification bus owned by something else: $owner" ;;
+    esac
+  done
