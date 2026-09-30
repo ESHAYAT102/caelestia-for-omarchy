@@ -65,6 +65,10 @@ Item {
                 list.currentList?.activate();
                 return;
             }
+            if (list.showEmojis) {
+                list.currentList?.activate(false);
+                return;
+            }
             if (list.showClipboard || list.showKeybindings) {
                 list.currentList?.activate();
                 return;
@@ -100,6 +104,13 @@ Item {
                     event.accepted = true;
                 } else if (event.key === Qt.Key_Delete) {
                     list.currentList?.deleteEntry(list.currentList?.currentItem?.modelData ?? null);
+                    event.accepted = true;
+                }
+                return;
+            }
+            if (list.showEmojis) {
+                if ((event.key === Qt.Key_Return || event.key === Qt.Key_Enter) && event.modifiers & Qt.ShiftModifier) {
+                    list.currentList?.activate(true);
                     event.accepted = true;
                 }
                 return;

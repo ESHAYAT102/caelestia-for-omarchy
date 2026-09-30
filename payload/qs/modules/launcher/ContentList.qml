@@ -22,9 +22,10 @@ Item {
     readonly property bool showUnlocks: search.text.startsWith(`${GlobalConfig.launcher.actionPrefix}unlock `)
     readonly property bool showClipboard: search.text.startsWith(`${GlobalConfig.launcher.actionPrefix}clipboard`)
     readonly property bool showKeybindings: search.text.startsWith(`${GlobalConfig.launcher.actionPrefix}keybindings`)
+    readonly property bool showEmojis: search.text.startsWith(`${GlobalConfig.launcher.actionPrefix}emoji`)
     readonly property bool showSpecialList: showWallpapers || showUnlocks
-    readonly property var currentList: showSpecialList ? specialList.item : showClipboard ? clipboardList.item : showKeybindings ? keybindingsList.item : appList.item
-    property string animState: showWallpapers ? "wallpapers" : showUnlocks ? "unlocks" : showClipboard ? "clipboard" : showKeybindings ? "keybindings" : "apps"
+    readonly property var currentList: showSpecialList ? specialList.item : showClipboard ? clipboardList.item : showKeybindings ? keybindingsList.item : showEmojis ? emojiList.item : appList.item
+    property string animState: showWallpapers ? "wallpapers" : showUnlocks ? "unlocks" : showClipboard ? "clipboard" : showKeybindings ? "keybindings" : showEmojis ? "emojis" : "apps"
 
     anchors.horizontalCenter: parent.horizontalCenter
     anchors.bottom: parent.bottom
@@ -42,6 +43,7 @@ Item {
                 appList.active: true
                 clipboardList.active: false
                 keybindingsList.active: false
+                emojiList.active: false
                 specialList.active: false
             }
 
@@ -59,6 +61,7 @@ Item {
                 specialList.active: true
                 clipboardList.active: false
                 keybindingsList.active: false
+                emojiList.active: false
                 appList.active: false
             }
         },
@@ -71,6 +74,7 @@ Item {
                 specialList.active: true
                 clipboardList.active: false
                 keybindingsList.active: false
+                emojiList.active: false
                 appList.active: false
             }
         },
@@ -82,6 +86,7 @@ Item {
                 root.implicitHeight: Math.min(root.maxHeight, clipboardList.implicitHeight)
                 clipboardList.active: true
                 keybindingsList.active: false
+                emojiList.active: false
                 appList.active: false
                 specialList.active: false
             }
@@ -98,6 +103,25 @@ Item {
                 root.implicitWidth: root.Tokens.sizes.launcher.itemWidth
                 root.implicitHeight: Math.min(root.maxHeight, keybindingsList.implicitHeight)
                 keybindingsList.active: true
+                emojiList.active: false
+                clipboardList.active: false
+                appList.active: false
+                specialList.active: false
+            }
+
+            AnchorChanges {
+                anchors.left: root.parent.left
+                anchors.right: root.parent.right
+            }
+        },
+        State {
+            name: "emojis"
+
+            PropertyChanges {
+                root.implicitWidth: root.Tokens.sizes.launcher.itemWidth
+                root.implicitHeight: Math.min(root.maxHeight, emojiList.implicitHeight)
+                emojiList.active: true
+                keybindingsList.active: false
                 clipboardList.active: false
                 appList.active: false
                 specialList.active: false
@@ -162,6 +186,18 @@ Item {
         anchors.fill: parent
         sourceComponent: KeybindingsList {
             objectName: "launcherKeybindingsList"
+            search: root.search
+            screenState: root.screenState
+        }
+    }
+
+    Loader {
+        id: emojiList
+
+        active: false
+        anchors.fill: parent
+        sourceComponent: EmojiList {
+            objectName: "launcherEmojiList"
             search: root.search
             screenState: root.screenState
         }

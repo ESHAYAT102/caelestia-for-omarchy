@@ -1,0 +1,44 @@
+#!/bin/bash
+
+set -euo pipefail
+
+mode="${1:?insert or copy required}"
+emoji="${2:?emoji required}"
+
+case "$mode" in
+  insert)
+    printf '%s' "$emoji" | wl-copy --type text/plain
+    for _ in $(seq 1 20); do
+      namespace="$(hyprctl activewindow -j 2>/dev/null | jq -r '.class // ""')"
+      [[ $namespace != quickshell ]] && break
+      sleep 0.05
+    done
+    sleep 0.35
+    wtype -M ctrl -k v -m ctrl
+    sleep 0.2
+    wl-copy --clear
+    sleep 0.3
+    python - "$emoji" "$HOME/.local/state/omarchy/clipboard-history.json" <<'PY'
+import json
+import sys
+
+emoji, path = sys.argv[1:]
+try:
+    with open(path, encoding="utf-8") as file:
+        entries = json.load(file)
+except (FileNotFoundError, json.JSONDecodeError):
+    entries = []
+
+entries = [entry for entry in entries if not (entry.get("type") == "text" and entry.get("text") == emoji)]
+with open(path, "w", encoding="utf-8") as file:
+    json.dump(entries, file, ensure_ascii=False)
+    file.write("\n")
+PY
+    ;;
+  copy)
+    printf '%s' "$emoji" | wl-copy --type text/plain
+    ;;
+  *)
+    exit 2
+    ;;
+esac

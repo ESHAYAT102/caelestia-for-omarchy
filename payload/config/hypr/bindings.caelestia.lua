@@ -38,7 +38,8 @@ bind("SUPER + Z", "Toggle Omanote", "omarchy-shell shell toggle b.omanote")
 bind("SUPER + CTRL + G", "Toggle window grouping", hl.dsp.group.toggle())
 
 bind("SUPER + period", "Emoji picker", "omarchy-menu-emoji")
-bind("SUPER + CTRL + E", "Emoji picker", "omarchy-menu-emoji")
+bind("SUPER + CTRL + E", "Caelestia emoji picker",
+  "qs -p $HOME/.local/share/caelestia-shell/qs ipc call drawers toggle launcher; sleep 0.2; wtype '>emoji '")
 
 local function delete_to_boundary(boundary, delete_key)
   return function()

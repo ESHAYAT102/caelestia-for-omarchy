@@ -34,6 +34,8 @@ StyledListView {
             return "unlocks";
         if (text.startsWith(`${prefix}keybindings`))
             return "keybindings";
+        if (text.startsWith(`${prefix}emoji`))
+            return "emojis";
         if (text.startsWith(prefix)) {
             for (const action of ["calc", "scheme", "variant"])
                 if (text.startsWith(`${prefix}${action} `))
@@ -50,6 +52,7 @@ StyledListView {
         case "clipboard":
         case "unlocks":
         case "keybindings":
+        case "emojis":
             return [0];
         case "actions":
             return Actions.query(text);
@@ -132,6 +135,13 @@ StyledListView {
         },
         State {
             name: "keybindings"
+
+            PropertyChanges {
+                root.delegate: actionItem
+            }
+        },
+        State {
+            name: "emojis"
 
             PropertyChanges {
                 root.delegate: actionItem
