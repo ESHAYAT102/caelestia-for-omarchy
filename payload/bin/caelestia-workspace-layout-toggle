@@ -1,0 +1,24 @@
+#!/bin/bash
+
+set -euo pipefail
+
+workspace="$(hyprctl activeworkspace -j | jq -r '.id')"
+[[ $workspace =~ ^-?[0-9]+$ ]]
+current="$(hyprctl activeworkspace -j | jq -r '.tiledLayout')"
+layouts_dir="$HOME/.local/state/omarchy/workspace-layouts"
+layout_file="$layouts_dir/$workspace.lua"
+
+case "$current" in
+  dwindle) next=scrolling ;;
+  *) next=dwindle ;;
+esac
+
+mkdir -p "$layouts_dir"
+printf 'hl.workspace_rule({ workspace = "%s", layout = "%s" })\n' "$workspace" "$next" > "$layout_file"
+hyprctl eval "hl.workspace_rule({ workspace = \"$workspace\", layout = \"$next\" })" >/dev/null 2>&1
+
+if pgrep -f "quickshell -n -p $HOME/.local/share/caelestia-shell/qs" >/dev/null 2>&1; then
+  qs -p "$HOME/.local/share/caelestia-shell/qs" ipc call toaster info "Workspace layout" "Layout set to $next" dashboard_customize
+else
+  omarchy notification send -g 󱂬 "Workspace layout set to $next"
+fi

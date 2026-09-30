@@ -7,4 +7,4 @@
 # watches. It never talks to Caelestia, so this works the same whether Caelestia
 # is running or not, and a fresh start picks the file up on its own.
 
-exec "$HOME/.config/omarchy/bridges/caelestia/omarchy-to-caelestia-scheme" "$1"
+exec "$HOME/.config/omarchy/bridges/caelestia/omarchy-wallpaper-to-caelestia" "$@"

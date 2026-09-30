@@ -49,6 +49,7 @@ readonly BINDINGS="$HOME/.config/hypr/bindings.lua"
 # very likely work; these are the ones the theme bridge's token map, the null
 # bar's three properties and the notification race were all tested against.
 readonly CAELESTIA_REPO="https://github.com/caelestia-dots/shell.git"
+readonly CAELESTIA_CLI_REPO="https://github.com/caelestia-dots/cli.git"
 readonly M3SHAPES_REPO="https://github.com/soramanew/m3shapes.git"
 CAELESTIA_REF="be3d6522a5f070d8396338ec60e2958b81f07e45"
 readonly M3SHAPES_REF="32ad9ce328bb77ed349b40a3be10ee9ea610b8ab"
@@ -64,9 +65,9 @@ readonly PKGS_ASSUMED=(qt6-shadertools qt6-imageformats ddcutil brightnessctl lm
 # Built with makepkg as an unprivileged user and installed with `pacman -U`,
 # deliberately NOT through an AUR helper: the package contents get listed before
 # anything is installed and no helper runs as root implicitly.
-#   libcava != cava — it is a library-only fork; `cava` is not installed and
-#   there is no conflict.
-readonly PKGS_AUR=(libcava ttf-rubik-vf)
+#   lib-cava provides the cava pkg-config module Caelestia requires. The newer
+#   libcava package only provides libcava.pc, so it cannot satisfy this build.
+readonly PKGS_AUR=(lib-cava ttf-rubik-vf)
 
 # --- packages that must NOT be present ---------------------------------------
 # README.md, "Updating Caelestia": quickshell-git provides+conflicts quickshell,
@@ -199,7 +200,7 @@ for p in "${PKGS_AUR[@]}"; do
   if ! ( cd "$tmp/$p" && makepkg -sf --noconfirm >/dev/null ); then
     err "makepkg failed for $p — build log in $tmp/$p"; continue
   fi
-  built="$(find "$tmp/$p" -maxdepth 1 -name '*.pkg.tar.*' ! -name '*.sig' | head -1)"
+  built="$(find "$tmp/$p" -maxdepth 1 -name "$p-[0-9]*.pkg.tar.*" ! -name '*.sig' ! -name '*-debug-*' | head -1)"
   [[ -n $built ]] || { err "no package produced for $p"; continue; }
   say "   $p contents:"
   bsdtar -tf "$built" 2>/dev/null | grep -v '^\.' | sed 's/^/     /' | head -20
@@ -331,7 +332,9 @@ step "8. Keybinds"
 # `o` and `hl` are globals Omarchy's Lua config loader injects; bindings.lua
 # uses them the same way.
 readonly MARK_BEGIN="-- >>> caelestia-on-omarchy >>>"
-if [[ ! -e $BINDINGS ]]; then
+if true; then
+  skip "complete keybinding profiles are installed by setup.sh"
+elif [[ ! -e $BINDINGS ]]; then
   err "no $BINDINGS — Omarchy should ship one; skipping keybinds"
 elif grep -qF -e "$MARK_BEGIN" "$BINDINGS"; then   # -e: the marker starts with --
   skip "keybind block already present in bindings.lua"
@@ -388,31 +391,35 @@ if ((DRY)); then :; else
 fi
 
 # -----------------------------------------------------------------------------
-step "10. Theme bridge, first run"
-# Writes ~/.local/state/caelestia/scheme.json, which Caelestia watches. Runs
-# whether Caelestia is up or not, so doing it before the units start is fine.
+step "10. Wallpaper palette bridge"
 if ((DRY)); then
-  printf '   [dry-run] %s && --check\n' "$BRIDGE_DIR/omarchy-to-caelestia-scheme"
+  printf '   [dry-run] generate Caelestia palette from the active wallpaper\n'
 else
-  "$BRIDGE_DIR/omarchy-to-caelestia-scheme" >/dev/null 2>&1 \
-    && did "scheme.json written from the active Omarchy theme" \
-    || err "theme bridge failed — themes will not follow"
-  check="$("$BRIDGE_DIR/omarchy-to-caelestia-scheme" --check 2>&1)"
-  case "$check" in
-    PASS*) did "$check" ;;
-    *)     err "bridge self-check: $check" ;;
-  esac
+  skip "installed by setup.sh after the private CLI is ready"
 fi
 
 # -----------------------------------------------------------------------------
 step "11. Autostart"
 run systemctl --user daemon-reload
 for u in "${UNITS[@]}"; do
+  if [[ $u == caelestia-notif-guard.service ]]; then
+    skip "notification guard disabled; Caelestia owns notifications in this setup"
+    continue
+  fi
   runq systemctl --user enable --now "$u" && did "enabled and started $u" || err "could not start $u"
 done
 
 # -----------------------------------------------------------------------------
-step "12. Verify"
+step "12. Install custom shell UI and mode switching"
+if ((DRY)); then
+  printf '   [dry-run] %s/setup.sh\n' "$ROOT"
+else
+  "$ROOT/setup.sh" || die "customized integration setup failed"
+  did "installed shell customizations and caelestia-on/off commands"
+fi
+
+# -----------------------------------------------------------------------------
+step "13. Verify"
 if ((DRY)); then
   skip "dry run — nothing to verify"
 else
@@ -436,7 +443,7 @@ else
   ck "bar.id" "$NULLBAR_ID" "$(jq -r '.bar.id // ""' "$OMARCHY_SHELL_JSON" 2>/dev/null)"
   ck "omarchy bar layers" "0" "$(hyprctl layers 2>/dev/null | grep -c 'namespace: omarchy-bar')"
   ck "caelestia drawers" "1" "$(hyprctl layers 2>/dev/null | grep -c 'namespace: caelestia-drawers')"
-  for u in "${UNITS[@]}"; do ck "$u" "active" "$(systemctl --user is-active "$u" 2>&1)"; done
+  ck "caelestia-shell.service" "active" "$(systemctl --user is-active caelestia-shell.service 2>&1)"
 fi
 
 # -----------------------------------------------------------------------------

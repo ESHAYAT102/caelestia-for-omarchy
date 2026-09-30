@@ -14,7 +14,11 @@ set -uo pipefail
 
 readonly PREFIX="$HOME/.local/share/caelestia-shell"
 readonly OMARCHY_SHELL="/usr/share/omarchy/shell"
-readonly BRIDGE="$HOME/.config/omarchy/bridges/caelestia/omarchy-to-caelestia-scheme"
+readonly OMARCHY_CONFIG="$HOME/.config/omarchy/shell.json"
+
+omarchy_notifications_enabled() {
+  ! jq -e '(.disabledPlugins // []) | index("omarchy.notifications")' "$OMARCHY_CONFIG" >/dev/null 2>&1
+}
 
 omarchy_owns_notification_bus() {
   busctl --user status org.freedesktop.Notifications 2>/dev/null |
@@ -32,17 +36,16 @@ fi
 # does nothing, because the command rides in an omarchy-exec-argv hint only
 # Omarchy's shell reads. omarchy-notification-wait is not enough on its own: it
 # only proves *someone* answers GetServerInformation.
-for _ in $(seq 1 150); do
-  omarchy_owns_notification_bus && break
-  sleep 0.2
-done
-omarchy_owns_notification_bus ||
-  echo "caelestia-start: WARNING omarchy does not own the notification bus" >&2
+if omarchy_notifications_enabled; then
+  for _ in $(seq 1 150); do
+    omarchy_owns_notification_bus && break
+    sleep 0.2
+  done
+  omarchy_owns_notification_bus ||
+    echo "caelestia-start: WARNING omarchy does not own the notification bus" >&2
+fi
 
-# Pick up the current Omarchy theme. A theme set while Caelestia was down has
-# already written scheme.json, so this only matters when something changed the
-# theme without firing the theme-set hook.
-"$BRIDGE" || true
+"$HOME/.config/omarchy/bridges/caelestia/omarchy-wallpaper-to-caelestia" || true
 
 exec env QML2_IMPORT_PATH="$PREFIX/qml" \
          QML_IMPORT_PATH="$PREFIX/qml" \

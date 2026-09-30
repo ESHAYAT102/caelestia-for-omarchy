@@ -1,0 +1,97 @@
+#!/bin/bash
+
+set -euo pipefail
+
+mode="${1:-}"
+config="$HOME/.config/omarchy/shell.json"
+bindings="$HOME/.config/hypr/bindings.lua"
+unit="caelestia-shell.service"
+state_dir="$HOME/.local/state/caelestia-mode"
+mode_file="$state_dir/mode"
+bindings_caelestia="$state_dir/bindings.caelestia.lua"
+bindings_omarchy="$state_dir/bindings.omarchy.lua"
+
+fail() {
+  printf 'caelestia-%s: %s\n' "$mode" "$*" >&2
+  exit 1
+}
+
+write_json() {
+  local filter="$1" tmp
+  tmp="$(mktemp)"
+  jq "$filter" "$config" > "$tmp" || { rm -f "$tmp"; fail "could not update $config"; }
+  mv "$tmp" "$config"
+}
+
+wait_for_omarchy() {
+  for _ in $(seq 1 40); do
+    omarchy-shell shell ping >/dev/null 2>&1 && return 0
+    sleep 0.25
+  done
+  fail "Omarchy shell did not become ready"
+}
+
+wait_for_caelestia() {
+  for _ in $(seq 1 40); do
+    pgrep -f "quickshell -n -p $HOME/.local/share/caelestia-shell/qs" >/dev/null 2>&1 && return 0
+    sleep 0.25
+  done
+  fail "Caelestia shell did not become ready"
+}
+
+mkdir -p "$state_dir"
+
+case "$mode" in
+  on)
+    [[ -e $bindings_caelestia ]] || cp -a "$bindings" "$bindings_caelestia"
+    cp -a "$bindings_caelestia" "$bindings"
+
+    write_json '
+        .bar.id = "thepiratefox.nullbar"
+      | .idle.screensaver = 300
+      | .idle.lock = 86400
+      | .disabledPlugins = (((.disabledPlugins // []) + ["omarchy.osd"]) | unique)
+    '
+
+    omarchy restart shell >/dev/null 2>&1 || true
+    wait_for_omarchy
+    systemctl --user enable "$unit" >/dev/null 2>&1 || true
+    systemctl --user restart "$unit"
+    wait_for_caelestia
+    hyprctl reload >/dev/null
+    [[ -z $(hyprctl configerrors) ]] || fail "Hyprland reported configuration errors"
+    printf 'caelestia\n' > "$mode_file"
+    printf 'Caelestia mode enabled.\n'
+    ;;
+  off)
+    cp -a "$bindings" "$bindings_caelestia"
+    [[ -e $bindings_omarchy ]] || cp -a "$bindings" "$bindings_omarchy"
+    cp -a "$bindings_omarchy" "$bindings"
+
+    systemctl --user disable --now "$unit" >/dev/null 2>&1 || true
+    write_json '
+        del(.bar.id)
+      | .idle.screensaver = 150
+      | .idle.lock = 300
+      | .disabledPlugins = ((.disabledPlugins // []) - ["omarchy.osd"])
+      | if (.disabledPlugins | length) == 0 then del(.disabledPlugins) else . end
+    '
+
+    omarchy restart shell >/dev/null
+    wait_for_omarchy
+    hyprctl reload >/dev/null
+    [[ -z $(hyprctl configerrors) ]] || fail "Hyprland reported configuration errors"
+    printf 'omarchy\n' > "$mode_file"
+    printf 'Omarchy mode enabled.\n'
+    ;;
+  status)
+    if pgrep -f "quickshell -n -p $HOME/.local/share/caelestia-shell/qs" >/dev/null 2>&1; then
+      printf 'caelestia\n'
+    else
+      printf 'omarchy\n'
+    fi
+    ;;
+  *)
+    fail "usage: caelestia-mode {on|off|status}"
+    ;;
+esac

@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -euo pipefail
+
+theme="${1:?unlock theme required}"
+if [[ $theme == default ]]; then
+  exec omarchy-launch-floating-terminal-with-presentation omarchy-plymouth-reset
+fi
+
+printf -v command 'omarchy-plymouth-set-by-theme %q' "$theme"
+exec omarchy-launch-floating-terminal-with-presentation "$command"

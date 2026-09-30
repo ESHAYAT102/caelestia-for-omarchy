@@ -1,0 +1,20 @@
+#!/bin/bash
+
+set -euo pipefail
+
+readonly CLI="$HOME/.local/share/caelestia-shell/cli-venv/bin/caelestia"
+readonly OMARCHY_WALL="$HOME/.local/state/omarchy/current/background"
+readonly WALL_STATE="$HOME/.local/state/caelestia/wallpaper/path.txt"
+readonly SCHEME_STATE="$HOME/.local/state/caelestia/scheme.json"
+
+wallpaper="$(readlink -f "$OMARCHY_WALL")"
+[[ -f $wallpaper ]]
+
+mkdir -p "$(dirname "$WALL_STATE")" "$(dirname "$SCHEME_STATE")"
+printf '%s\n' "$wallpaper" > "$WALL_STATE"
+
+scheme_tmp="$(mktemp)"
+trap 'rm -f "$scheme_tmp"' EXIT
+"$CLI" wallpaper --print "$wallpaper" > "$scheme_tmp"
+jq -e '.name == "dynamic" and (.colours.primary | type == "string")' "$scheme_tmp" >/dev/null
+mv "$scheme_tmp" "$SCHEME_STATE"

@@ -75,7 +75,17 @@ confirm() { # confirm <prompt> — yes in --yes mode, always yes in --dry-run
 # -----------------------------------------------------------------------------
 # First, and it has to be first: the unit is Restart=on-failure, so killing the
 # process while the unit is still enabled just brings it back in five seconds.
-step "1. Stop and remove the systemd user units"
+step "1. Remove custom UI, mode commands, and restore keybindings"
+if [[ -x $ROOT/remove-customizations.sh ]]; then
+  if ((DRY)); then
+    printf '   [dry-run] %s/remove-customizations.sh\n' "$ROOT"
+  else
+    "$ROOT/remove-customizations.sh" || err "customization removal reported an error"
+  fi
+fi
+
+# -----------------------------------------------------------------------------
+step "2. Stop and remove the systemd user units"
 for u in "${UNITS[@]}"; do
   if [[ -e $UNIT_DIR/$u ]]; then
     runq systemctl --user disable --now "$u" && did "disabled and stopped $u"
@@ -87,7 +97,7 @@ done
 runq systemctl --user daemon-reload && did "systemctl --user daemon-reload"
 
 # -----------------------------------------------------------------------------
-step "2. Stop Caelestia, if it is still running by hand"
+step "3. Stop Caelestia, if it is still running by hand"
 if pgrep -f "quickshell -n -p $CAELESTIA_QSDIR" >/dev/null 2>&1; then
   run pkill -f "quickshell -n -p $CAELESTIA_QSDIR" && did "sent TERM to Caelestia"
   ((DRY)) || { sleep 1; pgrep -f "quickshell -n -p $CAELESTIA_QSDIR" >/dev/null 2>&1 \
@@ -97,7 +107,7 @@ else
 fi
 
 # -----------------------------------------------------------------------------
-step "3. Remove the theme hook and the bridges"
+step "4. Remove the theme hook and the bridges"
 if [[ -e $THEME_HOOK ]]; then
   run rm -f "$THEME_HOOK" && did "removed $THEME_HOOK"
 else
@@ -110,7 +120,7 @@ else
 fi
 
 # -----------------------------------------------------------------------------
-step "4. Remove the null bar and give Omarchy its own bar back"
+step "5. Remove the null bar and give Omarchy its own bar back"
 # Order matters: unregister over IPC while the shell still knows the id, then
 # delete the directory. Reversed, the shell holds a dangling enabled id.
 if [[ -d $NULLBAR_DIR ]]; then
@@ -126,7 +136,7 @@ else
 fi
 
 # -----------------------------------------------------------------------------
-step "5. Undo the shell.json keys"
+step "6. Undo the shell.json keys"
 # Omitting bar.id selects the built-in bar. idle goes back to Omarchy's shipped
 # 150/300 rather than to whatever you had, because this script has no record of
 # what you had — check the .bak files listed at the end if those numbers matter.
@@ -158,7 +168,7 @@ else
 fi
 
 # -----------------------------------------------------------------------------
-step "6. Remove the keybind block from bindings.lua"
+step "7. Remove the keybind block from bindings.lua"
 # Excised by marker, so anything you added around it survives untouched. This is
 # why install.sh writes markers at all.
 if [[ ! -e $BINDINGS ]]; then
@@ -181,7 +191,7 @@ else
 fi
 
 # -----------------------------------------------------------------------------
-step "7. Restart Omarchy's shell"
+step "8. Restart Omarchy's shell"
 run omarchy restart shell && did "omarchy restart shell"
 if ((DRY)); then :; else
   for _ in {1..30}; do omarchy-shell shell ping >/dev/null 2>&1 && break; sleep 0.5; done
@@ -191,7 +201,7 @@ if ((DRY)); then :; else
 fi
 
 # -----------------------------------------------------------------------------
-step "8. Caelestia itself"
+step "9. Caelestia itself"
 if ((PURGE)); then
   for p in "$CAELESTIA_PREFIX" "$CAELESTIA_CONFIG" "$CAELESTIA_STATE"; do
     if [[ -e $p ]]; then
@@ -213,7 +223,7 @@ say "   Omarchy package, so removing them is optional and never urgent."
 say "   List them with: $ROOT/install.sh --help"
 
 # -----------------------------------------------------------------------------
-step "9. Backups install.sh and this script left behind"
+step "10. Backups install.sh and this script left behind"
 found=0
 for d in "$HOME/.config/omarchy" "$HOME/.config/hypr" "$HOME/.config/caelestia"; do
   [[ -d $d ]] || continue

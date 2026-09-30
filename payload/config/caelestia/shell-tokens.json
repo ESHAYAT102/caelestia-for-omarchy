@@ -1,0 +1,79 @@
+{
+    "sizes": {
+        "bar": {
+            "innerWidth": 25,
+            "windowPreviewSize": 250,
+            "trayMenuWidth": 188,
+            "batteryWidth": 156,
+            "networkWidth": 200,
+            "kbLayoutWidth": 200
+        },
+        "dashboard": {
+            "userWidth": 213,
+            "logoSize": 19,
+            "uptimeSize": 19,
+            "dateTimeWidth": 69,
+            "mediaWidth": 125,
+            "weatherWidth": 172,
+            "mediaCoverArtSize": 125,
+            "mediaTabWidth": 625,
+            "mediaTabHeight": 200,
+            "mediaSectionWidth": 188,
+            "perfHeroCardWidth": 250,
+            "perfUsageShapeSize": 63,
+            "perfStorageTextWidth": 100,
+            "perfNetworkCardWidth": 244,
+            "perfNetworkCardHeight": 138,
+            "perfBattWidth": 94,
+            "perfBattWidthSingle": 250,
+            "perfBattHeight": 100,
+            "perfPlaceholderWidth": 438
+        },
+        "launcher": {
+            "itemWidth": 375,
+            "itemHeight": 36,
+            "wallpaperWidth": 175,
+            "wallpaperHeight": 125
+        },
+        "notifs": {
+            "width": 320,
+            "image": 26,
+            "badge": 13
+        },
+        "osd": {
+            "sliderWidth": 19,
+            "sliderHeight": 94
+        },
+        "session": {
+            "button": 50
+        },
+        "sidebar": {
+            "width": 320
+        },
+        "utilities": {
+            "width": 320,
+            "toastWidth": 320
+        },
+        "lock": {
+            "centerWidth": 500
+        },
+        "winfo": {
+            "detailsWidth": 313
+        },
+        "nexus": {
+            "minWidth": 500,
+            "minHeight": 313,
+            "maxNavWidth": 375,
+            "maxContentWidth": 500,
+            "popupWidth": 188,
+            "minPopupHeight": 125,
+            "maxPopupHeight": 500,
+            "networkShowEthDetailWidth": 388,
+            "networkShowVpnDetailWidth": 388,
+            "maxDialogWidth": 250,
+            "maxDialogHeight": 375,
+            "textFieldWidth": 156,
+            "smallTextFieldWidth": 63
+        }
+    }
+}

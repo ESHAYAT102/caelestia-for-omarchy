@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set -euo pipefail
+
+wallpaper="$(realpath "${1:?wallpaper path required}")"
+[[ -f $wallpaper ]]
+
+omarchy-theme-bg-set "$wallpaper"
+mkdir -p "$HOME/.local/state/caelestia/wallpaper"
+printf '%s\n' "$wallpaper" > "$HOME/.local/state/caelestia/wallpaper/path.txt"
+"$HOME/.local/share/caelestia-shell/cli-venv/bin/caelestia" wallpaper --print "$wallpaper" > "$HOME/.local/state/caelestia/scheme.json.tmp"
+jq -e '.name == "dynamic" and (.colours.primary | type == "string")' "$HOME/.local/state/caelestia/scheme.json.tmp" >/dev/null
+mv "$HOME/.local/state/caelestia/scheme.json.tmp" "$HOME/.local/state/caelestia/scheme.json"
