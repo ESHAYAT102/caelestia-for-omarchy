@@ -7,6 +7,7 @@ import Quickshell.Io
 import Caelestia.Config
 import qs.components
 import qs.components.controls
+import qs.services
 import qs.modules.nexus.common
 
 PageBase {

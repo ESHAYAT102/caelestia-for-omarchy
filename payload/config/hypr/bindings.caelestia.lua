@@ -67,6 +67,8 @@ bind("SUPER + ESCAPE", "Caelestia power menu",
 bind("XF86PowerOff", "Caelestia power menu",
   "qs -p $HOME/.local/share/caelestia-shell/qs ipc call drawers toggle session", { locked = true })
 bind("SUPER + CTRL + S", "Toggle screensaver", "omarchy-toggle-screensaver")
+bind("SUPER + CTRL + I", "Toggle Caelestia Keep Awake",
+  "qs -p $HOME/.local/share/caelestia-shell/qs ipc call idleInhibitor toggle")
 bind("SUPER + CTRL + W", "Wi-Fi panel",
   "qs -p $HOME/.local/share/caelestia-shell/qs ipc call drawers togglePanel network")
 bind("SUPER + CTRL + B", "Bluetooth panel",

@@ -47,17 +47,25 @@ case "$mode" in
     cp -a "$bindings_caelestia" "$bindings"
 
     write_json '
-        .bar.id = "thepiratefox.nullbar"
+        .bar.id = "omarchy.bar"
       | .idle.screensaver = 300
       | .idle.lock = 86400
-      | .disabledPlugins = (((.disabledPlugins // []) + ["omarchy.osd"]) | unique)
+      | .disabledPlugins = (((.disabledPlugins // []) + ["omarchy.osd", "omarchy.notifications", "esh.notification-center"]) | unique)
     '
 
     omarchy restart shell >/dev/null 2>&1 || true
     wait_for_omarchy
+    omarchy-toggle bar-off on >/dev/null 2>&1 || true
+    omarchy-shell -q omarchy.bar syncHidden >/dev/null 2>&1 || true
     systemctl --user enable "$unit" >/dev/null 2>&1 || true
     systemctl --user restart "$unit"
     wait_for_caelestia
+    sleep 0.5
+    owner="$(busctl --user status org.freedesktop.Notifications 2>/dev/null | sed -n 's/^CommandLine=//p')"
+    if [[ $owner != *"$HOME/.local/share/caelestia-shell/qs"* ]]; then
+      systemctl --user restart "$unit"
+      wait_for_caelestia
+    fi
     hyprctl reload >/dev/null
     [[ -z $(hyprctl configerrors) ]] || fail "Hyprland reported configuration errors"
     printf 'caelestia\n' > "$mode_file"
@@ -69,11 +77,13 @@ case "$mode" in
     cp -a "$bindings_omarchy" "$bindings"
 
     systemctl --user disable --now "$unit" >/dev/null 2>&1 || true
+    omarchy-toggle bar-off off >/dev/null 2>&1 || true
+    omarchy-shell -q omarchy.bar syncHidden >/dev/null 2>&1 || true
     write_json '
         del(.bar.id)
       | .idle.screensaver = 150
       | .idle.lock = 300
-      | .disabledPlugins = ((.disabledPlugins // []) - ["omarchy.osd"])
+      | .disabledPlugins = ((.disabledPlugins // []) - ["omarchy.osd", "omarchy.notifications", "esh.notification-center"])
       | if (.disabledPlugins | length) == 0 then del(.disabledPlugins) else . end
     '
 
