@@ -2,4 +2,15 @@
 
 set -euo pipefail
 
-qs -p "$HOME/.local/share/caelestia-shell/qs" ipc call idleInhibitor toggle
+qs_bin="/usr/bin/qs"
+qs_path="$HOME/.local/share/caelestia-shell/qs"
+
+state=$("$qs_bin" -p "$qs_path" ipc call idleInhibitor isEnabled 2>/dev/null) || exit 0
+
+if [[ "$state" == "true" ]]; then
+  "$qs_bin" -p "$qs_path" ipc call idleInhibitor disable
+  "$qs_bin" -p "$qs_path" ipc call toaster info "Keep Awake" "Normal power management" coffee
+else
+  "$qs_bin" -p "$qs_path" ipc call idleInhibitor enable
+  "$qs_bin" -p "$qs_path" ipc call toaster info "Keep Awake" "Preventing sleep mode" coffee
+fi

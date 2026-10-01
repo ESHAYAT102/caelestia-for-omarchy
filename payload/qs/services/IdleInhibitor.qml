@@ -28,7 +28,8 @@ Singleton {
     }
 
     IdleInhibitor {
-        enabled: root.enabled
+        id: inhibitor
+        enabled: false
         window: PanelWindow {
             implicitWidth: 0
             implicitHeight: 0
@@ -37,25 +38,32 @@ Singleton {
         }
     }
 
+    onEnabledChanged: {
+        inhibitor.enabled = root.enabled;
+    }
+
     IpcHandler {
         function isEnabled(): bool {
-            return props.enabled;
+            return inhibitor.enabled;
         }
 
         function toggle(): void {
-            props.enabled = !props.enabled;
-            if (props.enabled)
+            inhibitor.enabled = !inhibitor.enabled;
+            props.enabled = inhibitor.enabled;
+            if (inhibitor.enabled)
                 Toaster.toast("Keep Awake", "Preventing sleep mode", "coffee", Toast.Info);
             else
                 Toaster.toast("Keep Awake", "Normal power management", "coffee", Toast.Info);
         }
 
         function enable(): void {
+            inhibitor.enabled = true;
             props.enabled = true;
             Toaster.toast("Keep Awake", "Preventing sleep mode", "coffee", Toast.Info);
         }
 
         function disable(): void {
+            inhibitor.enabled = false;
             props.enabled = false;
             Toaster.toast("Keep Awake", "Normal power management", "coffee", Toast.Info);
         }
