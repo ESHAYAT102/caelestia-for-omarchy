@@ -12,7 +12,7 @@ MaterialIcon {
     property bool connected
     property color colour: Colours.palette.m3secondary
 
-    text: "vpn_key"
+    text: "device_hub"
     color: connected ? colour : Colours.palette.m3outline
     fontStyle: Tokens.font.icon.medium
     fill: connected ? 1 : 0
