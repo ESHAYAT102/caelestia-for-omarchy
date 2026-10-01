@@ -18,7 +18,7 @@ rm -f "$HOME/.local/bin/caelestia-mode" \
       "$HOME/.local/bin/caelestia-workspace-layout-toggle" \
       "$HOME/.local/bin/caelestia-clipboard-toggle"
 rm -f "$HOME/.config/omarchy/hooks/theme-set.d/50-caelestia-scheme"
-rm -rf "$HOME/.local/share/caelestia-shell-to-omarchy" "$STATE"
+rm -rf "$STATE"
 hyprctl reload >/dev/null
 
 printf 'Removed custom Caelestia integration files. The private build remains installed.\n'

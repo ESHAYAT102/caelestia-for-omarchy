@@ -17,9 +17,7 @@ install_payload() {
   exit 1
 }
 
-mkdir -p "$STATE" "$HOME/.local/bin" "$HOME/.config/caelestia" "$HOME/.config/omarchy/bridges/caelestia" "$HOME/.config/omarchy/plugins/thepiratefox.nullbar" "$HOME/.config/systemd/user" "$HOME/.local/share/caelestia-shell-to-omarchy"
-rm -rf "$HOME/.local/share/caelestia-shell-to-omarchy/payload"
-cp -a "$ROOT/payload" "$HOME/.local/share/caelestia-shell-to-omarchy/payload"
+mkdir -p "$STATE" "$HOME/.local/bin" "$HOME/.config/caelestia" "$HOME/.config/omarchy/bridges/caelestia" "$HOME/.config/omarchy/plugins/thepiratefox.nullbar" "$HOME/.config/systemd/user"
 
 for file in "$ROOT"/payload/bin/*; do
   install_payload "$file" "$HOME/.local/bin/$(basename "$file")" 755

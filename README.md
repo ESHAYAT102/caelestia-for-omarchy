@@ -14,19 +14,24 @@ A complete Caelestia desktop-shell integration for Omarchy 4 without replacing O
 
 ## Install
 
+Run the one-command installer:
+
 ```bash
-git clone <your-repository-url> ~/code/caelestia-shell-to-omarchy
-cd ~/code/caelestia-shell-to-omarchy
-./install.sh --dry-run
-./install.sh
+curl -fsSL https://raw.githubusercontent.com/ESHAYAT102/caelestia-for-omarchy/main/scripts/install.sh | sh
+```
+
+It clones or updates the repository at:
+
+```text
+~/.config/caelestia-for-omarchy/
 ```
 
 The installer builds Caelestia and M3Shapes into `~/.local/share/caelestia-shell`, installs required dependencies, copies the customized shell payload, installs user services, and enables Caelestia mode.
 
-For an existing private build:
+To reuse an existing private build:
 
 ```bash
-./install.sh --skip-build
+curl -fsSL https://raw.githubusercontent.com/ESHAYAT102/caelestia-for-omarchy/main/scripts/install.sh | sh -s -- --skip-build
 ```
 
 ## Mode switching
@@ -55,24 +60,18 @@ caelestia-mode status
 | `SUPER + CTRL + W/B/A` | Wi-Fi / Bluetooth / Audio panels |
 | `SUPER + ALT + B` | Battery panel |
 
-## Remove
+## Uninstall
 
-Remove only customizations and retain the private build:
+Remove the integration while leaving the private build available for reuse:
 
 ```bash
-./remove-customizations.sh
+curl -fsSL https://raw.githubusercontent.com/ESHAYAT102/caelestia-for-omarchy/main/scripts/uninstall.sh | sh
 ```
 
-Remove the full integration:
+Also remove the private Caelestia build, config, and state:
 
 ```bash
-./uninstall.sh --yes
-```
-
-Also delete the private build and Caelestia config/state:
-
-```bash
-./uninstall.sh --yes --purge
+curl -fsSL https://raw.githubusercontent.com/ESHAYAT102/caelestia-for-omarchy/main/scripts/uninstall.sh | sh -s -- --purge
 ```
 
 ## Repository layout
