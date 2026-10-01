@@ -301,6 +301,11 @@
         "useFahrenheit": false
     },
     "session": {
+        "commands": {
+            "logout": [
+                "omarchy-system-logout"
+            ]
+        },
         "enabled": true
     },
     "utilities": {
