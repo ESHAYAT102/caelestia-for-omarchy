@@ -126,6 +126,16 @@ StyledRect {
                     }
                 }
                 DelegateChoice {
+                    roleValue: "tailscale"
+                    delegate: EntryWrapper {
+                        name: "tailscale"
+
+                        TailscaleStatus {
+                            colour: root.colour
+                        }
+                    }
+                }
+                DelegateChoice {
                     roleValue: "network"
                     delegate: EntryWrapper {
                         MaterialIcon {

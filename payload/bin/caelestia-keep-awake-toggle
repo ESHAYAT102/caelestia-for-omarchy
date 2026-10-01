@@ -1,0 +1,5 @@
+#!/bin/bash
+
+set -euo pipefail
+
+qs -p "$HOME/.local/share/caelestia-shell/qs" ipc call idleInhibitor toggle

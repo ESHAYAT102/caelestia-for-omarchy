@@ -3,6 +3,7 @@ pragma Singleton
 import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
+import qs.services
 
 Singleton {
     id: root
@@ -27,7 +28,7 @@ Singleton {
     }
 
     IdleInhibitor {
-        enabled: root.effectiveEnabled
+        enabled: root.enabled
         window: PanelWindow {
             implicitWidth: 0
             implicitHeight: 0
@@ -43,14 +44,20 @@ Singleton {
 
         function toggle(): void {
             props.enabled = !props.enabled;
+            if (props.enabled)
+                Toaster.toast("Keep Awake", "Preventing sleep mode", "coffee", Toast.Info);
+            else
+                Toaster.toast("Keep Awake", "Normal power management", "coffee", Toast.Info);
         }
 
         function enable(): void {
             props.enabled = true;
+            Toaster.toast("Keep Awake", "Preventing sleep mode", "coffee", Toast.Info);
         }
 
         function disable(): void {
             props.enabled = false;
+            Toaster.toast("Keep Awake", "Normal power management", "coffee", Toast.Info);
         }
 
         target: "idleInhibitor"

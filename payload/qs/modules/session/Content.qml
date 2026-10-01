@@ -49,11 +49,6 @@ Column {
         KeyNavigation.down: hibernate
     }
 
-    Item {
-        width: Tokens.sizes.session.button
-        height: Tokens.spacing.small
-    }
-
     SessionButton {
         id: hibernate
 

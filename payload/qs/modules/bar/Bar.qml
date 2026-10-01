@@ -174,9 +174,9 @@ ColumnLayout {
             DelegateChoice {
                 roleValue: "power"
                 delegate: EntryWrapper {
-                    Plugins {
-                        objectName: "taskbarPluginsButton"
-                        bar: root
+                    Power {
+                        objectName: "taskbarPowerButton"
+                        screenState: root.screenState
                     }
                 }
             }

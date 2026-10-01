@@ -108,8 +108,22 @@ Scope {
             }
         }
 
+        function openDashboardTab(tab: string): void {
+            const screenState = ShellState.forActive();
+            const order = ["dashboard", "media", "performance", "weather"];
+            const index = order.indexOf(tab);
+            if (index < 0)
+                return;
+            if (screenState.dashboard && screenState.dashboardTab === index)
+                screenState.dashboard = false;
+            else {
+                screenState.dashboardTab = index;
+                screenState.dashboard = true;
+            }
+        }
+
         function togglePanel(panel: string): void {
-            if (!["network", "bluetooth", "audio", "battery"].includes(panel))
+            if (!["network", "bluetooth", "audio", "battery", "tailscale"].includes(panel))
                 return;
             const components = ShellState.componentsForActive();
             const popouts = components?.panels?.popouts;

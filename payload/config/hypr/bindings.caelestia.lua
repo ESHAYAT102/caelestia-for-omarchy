@@ -28,18 +28,19 @@ bind("SUPER + V", "Caelestia clipboard",
 bind("SUPER + CTRL + V", "Caelestia clipboard",
   "$HOME/.local/bin/caelestia-clipboard-toggle")
 bind("SUPER + T", "Telegram", { launch = "Telegram" })
-bind("SUPER + ALT + T", "Toggle clock", "omarchy-shell esh.clock toggle")
+bind("SUPER + ALT + T", "Toggle clock", "qs -p $HOME/.local/share/caelestia-shell/qs ipc call notifs clear")
 bind("SUPER + F", "Toggle window floating/tiling", hl.dsp.window.float({ action = "toggle" }))
 bind("SUPER + SHIFT + F", "Full screen", hl.dsp.window.fullscreen({ mode = "fullscreen" }))
 bind("SUPER + R", "Open Remail", "omarchy-launch-webapp https://mail.eshayat.com")
 
-bind("SUPER + Z", "Toggle Omanote", "omarchy-shell shell toggle b.omanote")
+bind("SUPER + Z", "Toggle Omanote", "qs -p $HOME/.local/share/caelestia-shell/qs ipc call notifs clear")
 
 bind("SUPER + CTRL + G", "Toggle window grouping", hl.dsp.group.toggle())
 
-bind("SUPER + period", "Emoji picker", "omarchy-menu-emoji")
+bind("SUPER + period", "Caelestia emoji picker",
+  "$HOME/.local/bin/caelestia-launcher-type '>emoji '")
 bind("SUPER + CTRL + E", "Caelestia emoji picker",
-  "qs -p $HOME/.local/share/caelestia-shell/qs ipc call drawers toggle launcher; sleep 0.2; wtype '>emoji '")
+  "$HOME/.local/bin/caelestia-launcher-type '>emoji '")
 
 local function delete_to_boundary(boundary, delete_key)
   return function()
@@ -68,7 +69,7 @@ bind("XF86PowerOff", "Caelestia power menu",
   "qs -p $HOME/.local/share/caelestia-shell/qs ipc call drawers toggle session", { locked = true })
 bind("SUPER + CTRL + S", "Toggle screensaver", "omarchy-toggle-screensaver")
 bind("SUPER + CTRL + I", "Toggle Caelestia Keep Awake",
-  "qs -p $HOME/.local/share/caelestia-shell/qs ipc call idleInhibitor toggle")
+  "$HOME/.local/bin/caelestia-keep-awake-toggle")
 bind("SUPER + CTRL + W", "Wi-Fi panel",
   "qs -p $HOME/.local/share/caelestia-shell/qs ipc call drawers togglePanel network")
 bind("SUPER + CTRL + B", "Bluetooth panel",
@@ -85,13 +86,15 @@ bind("SHIFT + PRINT", "Screenshot selector", "omarchy screenshot")
 bind("CTRL + PRINT", "Color picking", "pkill hyprpicker || hyprpicker -a")
 bind("ALT + PRINT", "Extract text", "omarchy-capture-text")
 
-bind("SUPER + A", "Notification Center", "omarchy-shell esh.notification-center toggle")
-bind("SUPER + ALT + W", "Open Weather", "omarchy-notification-weather")
-bind("SUPER + CTRL + T", "Open Tailscale", "omarchy-shell shell toggle omarchy.tailscale")
+bind("SUPER + A", "Caelestia notifications", "qs -p $HOME/.local/share/caelestia-shell/qs ipc call notifs clear")
+bind("SUPER + ALT + W", "Caelestia weather",
+  "qs -p $HOME/.local/share/caelestia-shell/qs ipc call drawers openDashboardTab weather")
+bind("SUPER + CTRL + T", "Tailscale panel",
+  "qs -p $HOME/.local/share/caelestia-shell/qs ipc call drawers togglePanel tailscale")
 bind("SUPER + XF86AudioMute", "Switch audio output", "omarchy-audio-output-switch", { locked = true })
 
 bind("SUPER + K", "Keybindings",
-  "qs -p $HOME/.local/share/caelestia-shell/qs ipc call drawers toggle launcher; sleep 0.2; wtype '>keybindings '")
+  "$HOME/.local/bin/caelestia-launcher-type '>keybindings '")
 
 bind("SUPER + L", "Lock screen", "$HOME/.config/omarchy/bridges/caelestia/caelestia-lock")
 bind("SUPER + SHIFT + L", "Screensaver", "omarchy-launch-screensaver")
@@ -117,8 +120,8 @@ bind("SUPER + SHIFT + S", "Spotify", "spotify")
 bind("SUPER + SHIFT + M", "kew", "uwsm app -- $TERMINAL -e kew")
 bind("SUPER + ALT + M", "Cliamp", "uwsm app -- $TERMINAL -e cliamp")
 bind("SUPER + ALT + S", "Share", "localsend")
-bind("SUPER + I", "Settings", "omarchy-menu toggle setup")
-bind("SUPER + ALT + SPACE", "Confetti", "omarchy-shell esh.confetti fire")
+bind("SUPER + I", "Settings", "qs -p $HOME/.local/share/caelestia-shell/qs ipc call nexus open")
+bind("SUPER + ALT + SPACE", "Confetti", "qs -p $HOME/.local/share/caelestia-shell/qs ipc call toaster info Confetti '🎉' celebration")
 bind("SUPER + X", "Dictation", "voxtype record toggle")
 
 local repeat_locked = { locked = true, repeating = true }
@@ -151,14 +154,34 @@ bind("CTRL + ALT + TAB", "Herdr next tab", "herdr-tab-next")
 bind("CTRL + ALT + SHIFT + TAB", "Herdr previous tab", "herdr-tab-prev")
 
 bind("SUPER + SLASH", "Keybindings",
-  "qs -p $HOME/.local/share/caelestia-shell/qs ipc call drawers toggle launcher; sleep 0.2; wtype '>keybindings '")
+  "$HOME/.local/bin/caelestia-launcher-type '>keybindings '")
 
 bind("SUPER + grave", "Toggle scratchpad", hl.dsp.workspace.toggle_special("scratchpad"))
 bind("SUPER + SHIFT + grave", "Move window to scratchpad",
   hl.dsp.window.move({ workspace = "special:scratchpad", follow = false }))
 
--- o.bind("XF86Display", "Mission Control",
---   "omarchy-shell shell toggle io.github.andyweiboan.missioncontrol '{}'")
+hl.unbind("XF86AudioNext")
+hl.unbind("XF86AudioPause")
+hl.unbind("XF86AudioPlay")
+hl.unbind("XF86AudioPrev")
+hl.unbind("XF86Eject")
+hl.unbind("SHIFT + XF86AudioMute")
+hl.unbind("SHIFT + XF86AudioPause")
+hl.unbind("SHIFT + XF86AudioPlay")
+hl.unbind("ALT + XF86AudioPlay")
+hl.unbind("ALT + SHIFT + XF86AudioPlay")
+hl.unbind("SUPER + CTRL + Delete")
+hl.unbind("SUPER + CTRL + ALT + Delete")
+o.bind("XF86AudioNext", "Next track",
+  "qs -p $HOME/.local/share/caelestia-shell/qs ipc call mpris next", { locked = true })
+o.bind("XF86AudioPause", "Pause",
+  "qs -p $HOME/.local/share/caelestia-shell/qs ipc call mpris playPause", { locked = true })
+o.bind("XF86AudioPlay", "Play",
+  "qs -p $HOME/.local/share/caelestia-shell/qs ipc call mpris playPause", { locked = true })
+o.bind("XF86AudioPrev", "Previous track",
+  "qs -p $HOME/.local/share/caelestia-shell/qs ipc call mpris previous", { locked = true })
+o.bind("XF86Display", "Caelestia dashboard",
+  "qs -p $HOME/.local/share/caelestia-shell/qs ipc call drawers openDashboardTab dashboard")
 
 -- >>> caelestia-on-omarchy >>>
 -- Caelestia's panels. SUPER + D/A/U are Hyprland DBus global shortcuts (appid
@@ -174,10 +197,38 @@ bind("SUPER + SHIFT + grave", "Move window to scratchpad",
 -- against a 500 ms open animation.
 hl.unbind("SUPER + SPACE")
 hl.unbind("SUPER + CTRL + SPACE")
+hl.unbind("SUPER + SHIFT + SPACE")
+hl.unbind("SUPER + SHIFT + CTRL + SPACE")
+hl.unbind("SUPER + CTRL + C")
+hl.unbind("SUPER + CTRL + O")
+hl.unbind("SUPER + CTRL + H")
+hl.unbind("SUPER + CTRL + D")
+hl.unbind("SUPER + CTRL + P")
+hl.unbind("SUPER + CTRL + R")
+hl.unbind("SUPER + CTRL + Z")
+hl.unbind("SUPER + CTRL + N")
+hl.unbind("SUPER + CTRL + PERIOD")
+hl.unbind("SUPER + SHIFT + CTRL + A")
+hl.unbind("SUPER + SHIFT + CTRL + R")
+hl.unbind("SUPER + CTRL + ALT + D")
+hl.unbind("SUPER + CTRL + ALT + E")
+hl.unbind("SUPER + CTRL + ALT + R")
+hl.unbind("SUPER + CTRL + ALT + T")
+hl.unbind("SUPER + CTRL + ALT + B")
+hl.unbind("SUPER + CTRL + ALT + W")
+hl.unbind("SUPER + CTRL + ALT + Z")
+hl.unbind("SUPER + BACKSPACE")
+hl.unbind("SUPER + SHIFT + BACKSPACE")
+hl.unbind("SUPER + CTRL + BACKSPACE")
+hl.unbind("SUPER + CTRL + ALT + F")
+hl.unbind("SUPER + ALT + K")
+hl.unbind("SUPER + CTRL + K")
+hl.unbind("SUPER + CTRL + Q")
+hl.unbind("XF86Calculator")
 o.bind("SUPER + SPACE", "Caelestia launcher",
   "qs -p $HOME/.local/share/caelestia-shell/qs ipc call drawers toggle launcher")
 o.bind("SUPER + CTRL + SPACE", "Wallpaper picker",
-  "qs -p $HOME/.local/share/caelestia-shell/qs ipc call drawers toggle launcher; sleep 0.2; wtype '>wallpaper '")
+  "$HOME/.local/bin/caelestia-launcher-type '>wallpaper '")
 hl.unbind("XF86AudioRaiseVolume")
 hl.unbind("XF86AudioLowerVolume")
 hl.unbind("XF86AudioMute")

@@ -34,6 +34,14 @@ To reuse an existing private build:
 curl -fsSL https://raw.githubusercontent.com/ESHAYAT102/caelestia-for-omarchy/main/scripts/install.sh | sh -s -- --skip-build
 ```
 
+## Update configuration without rebuilding
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/ESHAYAT102/caelestia-for-omarchy/main/scripts/update.sh | sh
+```
+
+This updates the repository checkout and reapplies all QML, configuration, keybinding, helper, hook, and service files without rebuilding Caelestia or M3Shapes.
+
 ## Mode switching
 
 ```bash

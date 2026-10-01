@@ -110,8 +110,8 @@ Item {
         }
 
         Popout {
-            name: "pinnedplugins"
-            sourceComponent: PinnedPlugins {}
+            name: "tailscale"
+            sourceComponent: Tailscale {}
         }
 
         Popout {

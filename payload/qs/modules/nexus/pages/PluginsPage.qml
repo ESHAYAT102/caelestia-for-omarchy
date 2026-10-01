@@ -14,7 +14,6 @@ PageBase {
     id: root
 
     property var plugins: []
-    property var pinnedIds: []
     property bool loading
     readonly property Process listProcess: Process {
         command: ["omarchy", "plugin", "list", "--json"]
@@ -32,43 +31,12 @@ PageBase {
     readonly property Process actionProcess: Process {
         onExited: root.refresh()
     }
-    readonly property Process pinProcess: Process {
-        command: ["bash", "-lc", "file=\"$HOME/.config/caelestia/pinned-plugins.json\"; test -r \"$file\" && jq -c '[.[].id]' \"$file\" || printf '[]'"]
-        stdout: StdioCollector {
-            onStreamFinished: {
-                try { root.pinnedIds = JSON.parse(text); }
-                catch (error) { root.pinnedIds = []; }
-            }
-        }
-    }
-    readonly property Process savePinsProcess: Process {}
 
     title: qsTr("Plugins")
 
     function refresh(): void {
         loading = true;
-        pinProcess.running = true;
         listProcess.running = true;
-    }
-
-    function isPinnable(plugin: var): bool {
-        return plugin.enabled && plugin.kinds.includes("bar-widget");
-    }
-
-    function togglePin(plugin: var): void {
-        const next = pinnedIds.slice();
-        const index = next.indexOf(plugin.id);
-        if (index >= 0)
-            next.splice(index, 1);
-        else
-            next.push(plugin.id);
-        pinnedIds = next;
-        savePinsProcess.command = ["python", "-c", "import json,sys; plugins=json.loads(sys.argv[1]); ids=json.loads(sys.argv[2]); rows=[{'id':p['id'],'name':p['name']} for p in plugins if p['id'] in ids]; open(sys.argv[3],'w').write(json.dumps(rows,ensure_ascii=False)+'\\n')", JSON.stringify(plugins), JSON.stringify(next), `${Quickshell.env("HOME")}/.config/caelestia/pinned-plugins.json`];
-        savePinsProcess.running = true;
-    }
-
-    function trigger(plugin: var): void {
-        Quickshell.execDetached(["omarchy-shell", "shell", "toggle", plugin.id]);
     }
 
     function setEnabled(plugin: var, enabled: bool): void {
@@ -102,10 +70,6 @@ PageBase {
                 first: index === 0
                 last: index === root.plugins.length - 1
 
-                StateLayer {
-                    onClicked: root.trigger(row.modelData)
-                }
-
                 RowLayout {
                     id: layout
                     anchors.left: parent.left
@@ -137,14 +101,6 @@ PageBase {
                             font: Tokens.font.label.small
                             elide: Text.ElideRight
                         }
-                    }
-
-                    IconButton {
-                        visible: root.isPinnable(row.modelData)
-                        icon: root.pinnedIds.includes(row.modelData.id) ? "keep_off" : "keep"
-                        type: IconButton.Tonal
-                        isRound: true
-                        onClicked: root.togglePin(row.modelData)
                     }
 
                     StyledSwitch {
