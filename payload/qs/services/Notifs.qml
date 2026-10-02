@@ -20,6 +20,7 @@ Singleton {
     property alias dnd: props.dnd
 
     property bool loaded
+    property int revision
 
     function hasFullscreen(): bool {
         for (const monitor of Hypr.monitors.values) {
@@ -48,6 +49,7 @@ Singleton {
     }
 
     onListChanged: {
+        revision++;
         if (loaded)
             saveTimer.restart();
     }
@@ -55,7 +57,7 @@ Singleton {
     Timer {
         id: saveTimer
 
-        interval: 1000
+        interval: 250
         onTriggered: storage.setText(JSON.stringify(root.notClosed.map(n => ({
                     time: n.time,
                     id: n.id,

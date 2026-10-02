@@ -7,6 +7,7 @@ import Caelestia.Config
 import qs.components
 import qs.components.containers
 import qs.components.controls
+import qs.components.images
 import qs.services
 
 StyledListView {
@@ -93,7 +94,7 @@ StyledListView {
         id: row
         required property var modelData
         required property int index
-        implicitHeight: Tokens.sizes.launcher.itemHeight
+        implicitHeight: row.modelData.type === "image" ? Tokens.sizes.launcher.itemHeight * 2 : Tokens.sizes.launcher.itemHeight
         anchors.left: parent?.left
         anchors.right: parent?.right
 
@@ -102,8 +103,20 @@ StyledListView {
             onClicked: root.copyEntry(row.modelData)
         }
 
+        CachingImage {
+            id: imagePreview
+            visible: row.modelData.type === "image"
+            anchors.left: parent.left
+            anchors.leftMargin: Tokens.padding.medium
+            anchors.verticalCenter: parent.verticalCenter
+            width: parent.height - Tokens.padding.medium * 2
+            height: width
+            path: row.modelData.path
+        }
+
         MaterialIcon {
             id: icon
+            visible: row.modelData.type !== "image"
             anchors.left: parent.left
             anchors.leftMargin: Tokens.padding.medium
             anchors.verticalCenter: parent.verticalCenter
@@ -112,12 +125,12 @@ StyledListView {
         }
 
         StyledText {
-            anchors.left: icon.right
+            anchors.left: row.modelData.type === "image" ? imagePreview.right : icon.right
             anchors.leftMargin: Tokens.spacing.medium
             anchors.right: deleteIcon.left
             anchors.rightMargin: Tokens.spacing.medium
             anchors.verticalCenter: parent.verticalCenter
-            text: row.modelData.title
+            text: row.modelData.type === "image" ? qsTr("Image") : row.modelData.title
             font: Tokens.font.body.medium
             elide: Text.ElideRight
         }
