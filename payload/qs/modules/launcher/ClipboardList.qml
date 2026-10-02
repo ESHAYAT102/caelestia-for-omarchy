@@ -94,7 +94,7 @@ StyledListView {
         id: row
         required property var modelData
         required property int index
-        implicitHeight: row.modelData.type === "image" ? Tokens.sizes.launcher.itemHeight * 2 : Tokens.sizes.launcher.itemHeight
+        implicitHeight: Tokens.sizes.launcher.itemHeight
         anchors.left: parent?.left
         anchors.right: parent?.right
 
@@ -103,15 +103,21 @@ StyledListView {
             onClicked: root.copyEntry(row.modelData)
         }
 
-        CachingImage {
-            id: imagePreview
+        StyledClippingRect {
+            id: imageFrame
             visible: row.modelData.type === "image"
             anchors.left: parent.left
             anchors.leftMargin: Tokens.padding.medium
             anchors.verticalCenter: parent.verticalCenter
-            width: parent.height - Tokens.padding.medium * 2
-            height: width
-            path: row.modelData.path
+            width: Math.round(height * 1.5)
+            height: parent.height - Tokens.padding.small * 2
+            radius: Tokens.rounding.small
+            color: Colours.tPalette.m3surfaceContainerHigh
+
+            CachingImage {
+                anchors.fill: parent
+                path: row.modelData.path
+            }
         }
 
         MaterialIcon {
@@ -125,12 +131,12 @@ StyledListView {
         }
 
         StyledText {
-            anchors.left: row.modelData.type === "image" ? imagePreview.right : icon.right
+            anchors.left: row.modelData.type === "image" ? imageFrame.right : icon.right
             anchors.leftMargin: Tokens.spacing.medium
             anchors.right: deleteIcon.left
             anchors.rightMargin: Tokens.spacing.medium
             anchors.verticalCenter: parent.verticalCenter
-            text: row.modelData.type === "image" ? qsTr("Image") : row.modelData.title
+            text: row.modelData.type === "image" ? qsTr("Clipboard image") : row.modelData.title
             font: Tokens.font.body.medium
             elide: Text.ElideRight
         }
