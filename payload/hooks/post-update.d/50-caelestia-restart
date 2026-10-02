@@ -1,0 +1,9 @@
+#!/bin/bash
+
+set -euo pipefail
+
+if ! pgrep -f "quickshell -n -p $HOME/.local/share/caelestia-shell/qs" >/dev/null 2>&1; then
+  exit 0
+fi
+
+systemctl --user restart caelestia-shell.service
