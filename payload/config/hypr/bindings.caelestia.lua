@@ -28,12 +28,12 @@ bind("SUPER + V", "Caelestia clipboard",
 bind("SUPER + CTRL + V", "Caelestia clipboard",
   "$HOME/.local/bin/caelestia-clipboard-toggle")
 bind("SUPER + T", "Telegram", { launch = "Telegram" })
-bind("SUPER + ALT + T", "Toggle clock", "qs -p $HOME/.local/share/caelestia-shell/qs ipc call notifs clear")
+bind("SUPER + ALT + T", "Toggle clock", "omarchy-shell esh.clock toggle")
 bind("SUPER + F", "Toggle window floating/tiling", hl.dsp.window.float({ action = "toggle" }))
 bind("SUPER + SHIFT + F", "Full screen", hl.dsp.window.fullscreen({ mode = "fullscreen" }))
 bind("SUPER + R", "Open Remail", "omarchy-launch-webapp https://mail.eshayat.com")
 
-bind("SUPER + Z", "Toggle Omanote", "qs -p $HOME/.local/share/caelestia-shell/qs ipc call notifs clear")
+bind("SUPER + Z", "Toggle Omanote", "omarchy-shell shell toggle b.omanote")
 
 bind("SUPER + CTRL + G", "Toggle window grouping", hl.dsp.group.toggle())
 
@@ -86,7 +86,10 @@ bind("SHIFT + PRINT", "Screenshot selector", "omarchy screenshot")
 bind("CTRL + PRINT", "Color picking", "pkill hyprpicker || hyprpicker -a")
 bind("ALT + PRINT", "Extract text", "omarchy-capture-text")
 
-bind("SUPER + A", "Caelestia notifications", "qs -p $HOME/.local/share/caelestia-shell/qs ipc call notifs clear")
+-- SUPER + A opens Caelestia's sidebar (which hosts the notification dock) via
+-- the caelestia:sidebar global shortcut bound below. Do NOT bind notifs clear
+-- here: it would wipe the history every time the center is opened. Clearing
+-- lives on SUPER + comma instead.
 bind("SUPER + ALT + W", "Caelestia weather",
   "qs -p $HOME/.local/share/caelestia-shell/qs ipc call drawers openDashboardTab weather")
 bind("SUPER + CTRL + T", "Tailscale panel",
