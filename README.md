@@ -89,7 +89,7 @@ curl -fsSL https://raw.githubusercontent.com/ESHAYAT102/caelestia-for-omarchy/ma
 - `payload/bin/`: `caelestia-on`, `caelestia-off`, mode switching, clipboard, and workspace-layout helpers.
 - `bridges/`: wallpaper, theme, notification, launch, and lock integration.
 - `systemd/user/`: Caelestia user services.
-- `thepiratefox.nullbar/`: zero-size Omarchy bar used in Caelestia mode.
+- `thepiratefox.nullbar/`: zero-size Omarchy bar, kept as an available spare. Caelestia mode currently keeps `omarchy.bar` and hides it at runtime via the `bar-off` toggle instead.
 
 ## Notes
 

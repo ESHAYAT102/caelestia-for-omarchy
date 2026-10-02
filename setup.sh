@@ -2,6 +2,20 @@
 
 set -euo pipefail
 
+# Session-env recovery (see install.sh): the installer can run without the
+# interactive shell's environment, and caelestia-on needs IPC + hyprctl.
+: "${OMARCHY_PATH:=/usr/share/omarchy}"
+export OMARCHY_PATH
+if [[ -z ${WAYLAND_DISPLAY:-} ]]; then
+  _wl=$(ls -t "${XDG_RUNTIME_DIR:-/run/user/$UID}"/wayland-[0-9]* 2>/dev/null | grep -v '\.lock$' | head -n1)
+  [[ -n ${_wl:-} ]] && export WAYLAND_DISPLAY=${_wl##*/}
+fi
+if [[ -z ${HYPRLAND_INSTANCE_SIGNATURE:-} ]]; then
+  _hs=$(ls -t "${XDG_RUNTIME_DIR:-/run/user/$UID}"/hypr/ 2>/dev/null | head -n1)
+  [[ -n ${_hs:-} ]] && export HYPRLAND_INSTANCE_SIGNATURE=$_hs
+fi
+unset _wl _hs
+
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PREFIX="$HOME/.local/share/caelestia-shell"
 QSDIR="$PREFIX/qs"

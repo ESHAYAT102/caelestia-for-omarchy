@@ -90,6 +90,24 @@ while (($#)); do
 done
 readonly CAELESTIA_REF
 
+# --- session environment -----------------------------------------------------
+# The curl|sh entrypoint runs under `sh` without the interactive shell's
+# environment: OMARCHY_PATH (exported from bashrc), WAYLAND_DISPLAY and
+# HYPRLAND_INSTANCE_SIGNATURE are all missing over ssh, on a TTY or in a
+# pipe. Recover usable defaults so omarchy-shell IPC, hyprctl and busctl
+# work anywhere in the install.
+: "${OMARCHY_PATH:=/usr/share/omarchy}"
+export OMARCHY_PATH
+if [[ -z ${WAYLAND_DISPLAY:-} ]]; then
+  _wl=$(ls -t "${XDG_RUNTIME_DIR:-/run/user/$UID}"/wayland-[0-9]* 2>/dev/null | grep -v '\.lock$' | head -n1)
+  [[ -n ${_wl:-} ]] && export WAYLAND_DISPLAY=${_wl##*/}
+fi
+if [[ -z ${HYPRLAND_INSTANCE_SIGNATURE:-} ]]; then
+  _hs=$(ls -t "${XDG_RUNTIME_DIR:-/run/user/$UID}"/hypr/ 2>/dev/null | head -n1)
+  [[ -n ${_hs:-} ]] && export HYPRLAND_INSTANCE_SIGNATURE=$_hs
+fi
+unset _wl _hs
+
 failures=0
 say()  { printf '%s\n' "$*"; }
 step() { printf '\n\033[1m== %s\033[0m\n' "$*"; }
@@ -291,9 +309,14 @@ fi
 rm -f "$tmpcfg"
 
 # -----------------------------------------------------------------------------
-step "7. Omarchy's shell.json — four keys, merged"
-#   bar.id           the null bar, so Omarchy creates no bar surface at all
-#   disabledPlugins  omarchy.osd, or both OSDs fire on every volume keypress
+step "7. Omarchy's shell.json — bar, plugins and idle, merged"
+# Mirrors what caelestia-mode on writes, so setup.sh (step 12) does not undo
+# this merge and the verify step agrees with it:
+#   bar.id           omarchy.bar, hidden at runtime via the bar-off toggle
+#                    (caelestia-mode on runs `omarchy-toggle bar-off on`)
+#   bar.position     left, Caelestia's edge
+#   disabledPlugins  omarchy.osd (or both OSDs fire), omarchy.notifications
+#                    and esh.notification-center (Caelestia owns the bus)
 #   idle.screensaver 300, and idle.lock parked at 24 h — Caelestia owns the
 #                    timed lock now, at 310 s. Read README.md "Idle and lock"
 #                    before changing either number; 310 is not a typo.
@@ -305,15 +328,16 @@ fi
 if ((DRY)); then
   printf '   [dry-run] jq-merge bar.id / disabledPlugins / idle into %s\n' "$OMARCHY_SHELL_JSON"
 else
-  merged="$(jq --arg id "$NULLBAR_ID" '
-      .bar.id = $id
+  merged="$(jq '
+      .bar.id = "omarchy.bar"
+    | .bar.position = "left"
     | .idle.screensaver = 300
     | .idle.lock = 86400
-    | .disabledPlugins = (((.disabledPlugins // []) + ["omarchy.osd"]) | unique)
+    | .disabledPlugins = (((.disabledPlugins // []) + ["omarchy.osd", "omarchy.notifications", "esh.notification-center"]) | unique)
   ' "$OMARCHY_SHELL_JSON")" || err "jq failed on $OMARCHY_SHELL_JSON"
   if [[ -n ${merged:-} ]]; then
     if [[ $merged == "$(cat "$OMARCHY_SHELL_JSON")" ]]; then
-      skip "shell.json already carries all four keys"
+      skip "shell.json already carries the Caelestia keys"
     else
       diff -u --label current --label merged "$OMARCHY_SHELL_JSON" <(printf '%s\n' "$merged") | sed 's/^/   /' | head -40
       if confirm "apply this to shell.json (a .bak copy is kept)"; then
@@ -377,11 +401,11 @@ LUA
 fi
 
 # -----------------------------------------------------------------------------
-step "9. Restart Omarchy's shell so the null bar takes effect"
-# Before Caelestia starts, and this order is load-bearing. Quickshell requests
-# org.freedesktop.Notifications without REPLACE_EXISTING, so whoever asks first
-# keeps it. If Caelestia wins, the crash-diagnosis toast still appears but its
-# click does nothing -- the command rides in a hint only Omarchy's shell reads.
+step "9. Restart Omarchy's shell so the merged shell.json takes effect"
+# Before Caelestia starts. Caelestia is meant to own org.freedesktop.Notifications
+# here (omarchy.notifications is disabled in step 7), and Quickshell grants the
+# name without REPLACE_EXISTING to whoever asks first — so the shell must be
+# back up before the unit starts below, and step 11 re-checks the owner.
 run omarchy restart shell && did "omarchy restart shell"
 if ((DRY)); then :; else
   for _ in {1..30}; do omarchy-shell shell ping >/dev/null 2>&1 && break; sleep 0.5; done
@@ -408,6 +432,18 @@ for u in "${UNITS[@]}"; do
   fi
   runq systemctl --user enable --now "$u" && did "enabled and started $u" || err "could not start $u"
 done
+# Caelestia must own the notification bus (same guard as caelestia-mode on):
+# if Omarchy claimed it first, restart the unit so Caelestia re-asks.
+if ((DRY)); then :; else
+  sleep 0.5
+  if [[ $(busctl --user status org.freedesktop.Notifications 2>/dev/null | sed -n 's/^CommandLine=//p') != *"$CAELESTIA_QSDIR"* ]]; then
+    runq systemctl --user restart caelestia-shell.service \
+      && did "restarted caelestia-shell.service so Caelestia owns notifications" \
+      || err "could not restart caelestia-shell.service"
+  else
+    did "Caelestia owns notifications"
+  fi
+fi
 
 # -----------------------------------------------------------------------------
 step "12. Install custom shell UI and mode switching"
@@ -433,16 +469,19 @@ else
   ck() { # ck <label> <expect> <actual>
     if [[ $3 == "$2" ]]; then did "$1: $3"; else err "$1: expected '$2', got '$3'"; fi
   }
+  ck_at_least() { # ck_at_least <label> <min> <actual>
+    if [[ $3 -ge $2 ]]; then did "$1: $3"; else err "$1: expected at least $2, got '$3'"; fi
+  }
   # Same expressions driftcheck.sh uses, so the two agree on what "installed"
   # means. `pgrep -cx quickshell` and not -cf: -f would also match this script's
   # own command line.
   ck "quickshell processes" "2" "$(pgrep -cx quickshell)"
-  ck "notification bus owner" "/usr/share/omarchy/shell" \
+  ck "notification bus owner" "$CAELESTIA_QSDIR" \
      "$(busctl --user status org.freedesktop.Notifications 2>/dev/null | sed -n 's/.*-p //p')"
   ck "omarchy-shell ping" "ok" "$(omarchy-shell shell ping 2>&1)"
-  ck "bar.id" "$NULLBAR_ID" "$(jq -r '.bar.id // ""' "$OMARCHY_SHELL_JSON" 2>/dev/null)"
-  ck "omarchy bar layers" "0" "$(hyprctl layers 2>/dev/null | grep -c 'namespace: omarchy-bar')"
-  ck "caelestia drawers" "1" "$(hyprctl layers 2>/dev/null | grep -c 'namespace: caelestia-drawers')"
+  ck "bar.id" "omarchy.bar" "$(jq -r '.bar.id // ""' "$OMARCHY_SHELL_JSON" 2>/dev/null)"
+  ck "bar-off toggle" "on" "$([[ -f $HOME/.local/state/omarchy/toggles/bar-off ]] && echo on || echo off)"
+  ck_at_least "caelestia drawers" "1" "$(hyprctl layers 2>/dev/null | grep -c 'namespace: caelestia-drawers')"
   ck "caelestia-shell.service" "active" "$(systemctl --user is-active caelestia-shell.service 2>&1)"
 fi
 

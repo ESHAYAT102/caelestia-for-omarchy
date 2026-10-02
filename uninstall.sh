@@ -25,6 +25,10 @@
 
 set -uo pipefail
 
+# Same session-env recovery as install.sh (ssh/TTY/pipe have no OMARCHY_PATH).
+: "${OMARCHY_PATH:=/usr/share/omarchy}"
+export OMARCHY_PATH
+
 readonly ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # --- what this owns ----------------------------------------------------------
@@ -143,13 +147,13 @@ step "6. Undo the shell.json keys"
 if [[ ! -e $OMARCHY_SHELL_JSON ]]; then
   skip "absent: $OMARCHY_SHELL_JSON"
 elif ((DRY)); then
-  printf '   [dry-run] jq: del bar.id, drop omarchy.osd, idle back to 150/300\n'
+  printf '   [dry-run] jq: del bar.id, drop caelestia plugins, idle back to 150/300\n'
 else
   reverted="$(jq '
       del(.bar.id)
     | .idle.screensaver = 150
     | .idle.lock = 300
-    | .disabledPlugins = ((.disabledPlugins // []) - ["omarchy.osd"])
+    | .disabledPlugins = ((.disabledPlugins // []) - ["omarchy.osd", "omarchy.notifications", "esh.notification-center"])
     | if (.disabledPlugins | length) == 0 then del(.disabledPlugins) else . end
   ' "$OMARCHY_SHELL_JSON")" || err "jq failed on $OMARCHY_SHELL_JSON"
   if [[ -n ${reverted:-} ]]; then
@@ -192,6 +196,11 @@ fi
 
 # -----------------------------------------------------------------------------
 step "8. Restart Omarchy's shell"
+# Caelestia mode hides Omarchy's bar via the bar-off toggle — clear it so the
+# bar comes back with the shell.
+if [[ -f $HOME/.local/state/omarchy/toggles/bar-off ]]; then
+  run rm -f "$HOME/.local/state/omarchy/toggles/bar-off" && did "cleared the bar-off toggle"
+fi
 run omarchy restart shell && did "omarchy restart shell"
 if ((DRY)); then :; else
   for _ in {1..30}; do omarchy-shell shell ping >/dev/null 2>&1 && break; sleep 0.5; done
