@@ -48,6 +48,9 @@ StyledListView {
     }
 
     function resultsForText(text: string): var {
+        if (text.trim().length === 0)
+            return [{ commandMenu: true }].concat(Apps.search(text));
+
         switch (stateForText(text)) {
         case "clipboard":
         case "unlocks":
@@ -292,6 +295,7 @@ StyledListView {
         id: appItem
 
         AppItem {
+            list: root
             screenState: root.screenState
         }
     }

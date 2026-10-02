@@ -284,6 +284,15 @@
                 "description": "Remove an installed package",
                 "icon": "delete",
                 "name": "Remove Package"
+            },
+            {
+                "command": [
+                    "omarchy-launch-floating-terminal-with-presentation",
+                    "omarchy-update"
+                ],
+                "description": "Update Omarchy and all packages",
+                "icon": "system_update",
+                "name": "Update System"
             }
         ],
         "hiddenApps": [
