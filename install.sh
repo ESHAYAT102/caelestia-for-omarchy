@@ -184,10 +184,12 @@ step "2. Snapshot, so there is a way back"
 if command -v snapper >/dev/null 2>&1; then
   if runq omarchy snapshot create; then
     did "snapper snapshot created"
-  else
+  elif sudo -n snapper --csvout list-configs 2>/dev/null | tail -n +2 | grep -q .; then
     err "could not create a snapshot automatically"
     say "     try by hand:  pkexec snapper -c root create -c number -d 'pre-caelestia $omarchy_ver'"
     say "     then pin it — every pacman -S rotates one out at NUMBER_LIMIT=5"
+  else
+    skip "no snapper configs on this machine — no system snapshot; rollback.sh is still your undo"
   fi
 else
   skip "snapper absent — no system snapshot; rollback.sh is still your undo"
