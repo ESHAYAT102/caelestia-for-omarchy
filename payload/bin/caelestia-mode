@@ -62,8 +62,7 @@ case "$mode" in
     cp -a "$bindings_caelestia" "$bindings"
 
     write_json '
-        .bar.id = "omarchy.bar"
-      | .bar.position = "left"
+        .bar.id = "thepiratefox.nullbar"
       | .idle.screensaver = 300
       | .idle.lock = 86400
       | .disabledPlugins = (((.disabledPlugins // []) + ["omarchy.osd", "omarchy.notifications", "esh.notification-center"]) | unique)
@@ -71,8 +70,7 @@ case "$mode" in
 
     omarchy restart shell >/dev/null 2>&1 || true
     wait_for_omarchy
-    omarchy-toggle bar-off on >/dev/null 2>&1 || true
-    omarchy-shell -q omarchy.bar syncHidden >/dev/null 2>&1 || true
+    omarchy-toggle bar-off off >/dev/null 2>&1 || true
     systemctl --user enable "$unit" >/dev/null 2>&1 || true
     systemctl --user restart "$unit"
     wait_for_caelestia
@@ -92,12 +90,7 @@ case "$mode" in
     [[ -e $bindings_omarchy ]] || cp -a "$bindings" "$bindings_omarchy"
     cp -a "$bindings_omarchy" "$bindings"
 
-    write_json '
-        .bar.position = "top"
-    '
     systemctl --user disable --now "$unit" >/dev/null 2>&1 || true
-    omarchy-toggle bar-off off >/dev/null 2>&1 || true
-    omarchy-shell -q omarchy.bar syncHidden >/dev/null 2>&1 || true
     write_json '
         del(.bar.id)
       | .idle.screensaver = 150
