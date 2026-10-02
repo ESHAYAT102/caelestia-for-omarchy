@@ -138,6 +138,14 @@ ColumnLayout {
                 }
             }
             DelegateChoice {
+                roleValue: "updates"
+                delegate: EntryWrapper {
+                    UpdateIndicator {
+                        objectName: "taskbarUpdateIndicator"
+                    }
+                }
+            }
+            DelegateChoice {
                 roleValue: "activeWindow"
                 delegate: EntryWrapper {
                     ActiveWindow {
