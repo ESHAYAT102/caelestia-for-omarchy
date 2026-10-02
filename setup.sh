@@ -54,10 +54,12 @@ cp -a "$STATE/bindings.caelestia.lua" "$HOME/.config/hypr/bindings.lua"
 
 install_payload "$ROOT/hooks/theme-set.d/50-caelestia-scheme" "$HOME/.config/omarchy/hooks/theme-set.d/50-caelestia-scheme" 755
 
-"$HOME/.config/omarchy/bridges/caelestia/omarchy-wallpaper-to-caelestia"
-hyprctl reload >/dev/null
-systemctl --user daemon-reload
+"$HOME/.config/omarchy/bridges/caelestia/omarchy-wallpaper-to-caelestia" || true
+if [[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]]; then
+  hyprctl reload >/dev/null 2>&1 || true
+fi
+systemctl --user daemon-reload >/dev/null 2>&1 || true
 if [[ -f $HOME/.config/systemd/user/caelestia-shell.service ]]; then
-  "$HOME/.local/bin/caelestia-on"
+  "$HOME/.local/bin/caelestia-on" || true
 fi
 printf 'Installed the complete Caelestia integration.\n'
