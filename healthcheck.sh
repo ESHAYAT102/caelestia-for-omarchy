@@ -4,6 +4,17 @@ set -uo pipefail
 
 : "${OMARCHY_PATH:=/usr/share/omarchy}"
 export OMARCHY_PATH
+# Same session-env recovery as install.sh: hyprctl needs these, and they are
+# missing over ssh or on a TTY.
+if [[ -z ${WAYLAND_DISPLAY:-} ]]; then
+  _wl=$(ls -t "${XDG_RUNTIME_DIR:-/run/user/$UID}"/wayland-[0-9]* 2>/dev/null | grep -v '\.lock$' | head -n1)
+  [[ -n ${_wl:-} ]] && export WAYLAND_DISPLAY=${_wl##*/}
+fi
+if [[ -z ${HYPRLAND_INSTANCE_SIGNATURE:-} ]]; then
+  _hs=$(ls -t "${XDG_RUNTIME_DIR:-/run/user/$UID}"/hypr/ 2>/dev/null | head -n1)
+  [[ -n ${_hs:-} ]] && export HYPRLAND_INSTANCE_SIGNATURE=$_hs
+fi
+unset _wl _hs
 
 pass=0
 fail=0
