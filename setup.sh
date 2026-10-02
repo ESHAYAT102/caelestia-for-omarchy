@@ -46,6 +46,16 @@ while IFS= read -r -d '' file; do
   install_payload "$file" "$QSDIR/$rel"
 done < <(find "$ROOT/payload/qs" -type f -print0)
 
+# Retired payload overrides: files the payload used to ship under these paths
+# but no longer does (renamed upstream or folded back). cmake --install and the
+# loop above only add/overwrite, so without this a stale copy lingers in the
+# prefix and can shadow the replacement (e.g. the old AppItem.qml vs items/).
+for retired in \
+  "modules/launcher/AppItem.qml" \
+; do
+  rm -f "$QSDIR/$retired"
+done
+
 sed "s#/home/esh#$HOME#g" "$ROOT/payload/config/caelestia/shell.json" > "$HOME/.config/caelestia/shell.json"
 install_payload "$ROOT/payload/config/caelestia/shell-tokens.json" "$HOME/.config/caelestia/shell-tokens.json"
 

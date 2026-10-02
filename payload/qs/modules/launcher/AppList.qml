@@ -294,7 +294,7 @@ StyledListView {
     Component {
         id: appItem
 
-        AppItem {
+        AppEntry {
             list: root
             screenState: root.screenState
         }
