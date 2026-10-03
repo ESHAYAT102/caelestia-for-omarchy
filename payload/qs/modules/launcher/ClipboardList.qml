@@ -70,7 +70,7 @@ StyledListView {
 
     spacing: Tokens.spacing.small
     orientation: Qt.Vertical
-    implicitHeight: count > 0 ? (Tokens.sizes.launcher.itemHeight + spacing) * Math.min(Config.launcher.maxShown, count) - spacing : Tokens.sizes.launcher.itemHeight
+    implicitHeight: count > 0 ? Math.min(contentHeight, (Tokens.sizes.launcher.itemHeight + spacing) * Config.launcher.maxShown - spacing) : Tokens.sizes.launcher.itemHeight
     preferredHighlightBegin: 0
     preferredHighlightEnd: height
     highlightRangeMode: ListView.ApplyRange
@@ -94,9 +94,14 @@ StyledListView {
         id: row
         required property var modelData
         required property int index
-        implicitHeight: Tokens.sizes.launcher.itemHeight
+        readonly property bool expanded: modelData.type === "image" && ListView.isCurrentItem
+        implicitHeight: expanded ? Tokens.sizes.launcher.itemHeight * 3.25 : Tokens.sizes.launcher.itemHeight
         anchors.left: parent?.left
         anchors.right: parent?.right
+
+        Behavior on implicitHeight {
+            Anim {}
+        }
 
         StateLayer {
             radius: Tokens.rounding.large
@@ -109,10 +114,14 @@ StyledListView {
             anchors.left: parent.left
             anchors.leftMargin: Tokens.padding.medium
             anchors.verticalCenter: parent.verticalCenter
-            width: Math.round(height * 1.5)
+            width: row.expanded ? Math.min(Math.round(height * 16 / 9), row.width * 0.64) : Math.round(height * 1.5)
             height: parent.height - Tokens.padding.small * 2
-            radius: Tokens.rounding.small
+            radius: row.expanded ? Tokens.rounding.medium : Tokens.rounding.small
             color: Colours.tPalette.m3surfaceContainerHigh
+
+            Behavior on width {
+                Anim {}
+            }
 
             CachingImage {
                 anchors.fill: parent
@@ -173,7 +182,7 @@ StyledListView {
 
     Process {
         id: historyProcess
-        command: ["python", "-c", "import json,sys; d=json.load(open(sys.argv[1])); print(json.dumps([{'index':i,'type':x.get('type','text'),'title':(' '.join((x.get('text','') if x.get('type')=='text' else '[Image]').split())[:120]),'mime':x.get('mime','image/png'),'path':x.get('path','')} for i,x in enumerate(d) if x.get('type')=='image' or (x.get('type')=='text' and isinstance(x.get('text'),str))]))", Quickshell.env("HOME") + "/.local/state/omarchy/clipboard-history.json"]
+        command: ["python", "-c", "import json,os,sys; d=json.load(open(sys.argv[1])); print(json.dumps([{'index':i,'type':x.get('type','text'),'title':(' '.join((x.get('text','') if x.get('type')=='text' else '[Image]').split())[:120]),'mime':x.get('mime','image/png'),'path':x.get('path','')} for i,x in enumerate(d) if (x.get('type')=='image' and os.path.isfile(x.get('path',''))) or (x.get('type')=='text' and isinstance(x.get('text'),str))]))", Quickshell.env("HOME") + "/.local/state/omarchy/clipboard-history.json"]
         stdout: StdioCollector {
             onStreamFinished: {
                 try {
