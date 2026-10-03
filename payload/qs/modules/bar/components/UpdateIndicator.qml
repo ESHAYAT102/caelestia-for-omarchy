@@ -41,7 +41,7 @@ Item {
     StyledText {
         id: icon
         anchors.centerIn: parent
-        anchors.horizontalCenterOffset: -2
+        anchors.horizontalCenterOffset: -2.5
         anchors.verticalCenterOffset: 0
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter

@@ -18,7 +18,7 @@ step "pacman (system packages)"
 sudo env OMARCHY_ALLOW_DIRECT_PACMAN=1 pacman -Syu --noconfirm || exit $?
 
 step "yay (AUR packages)"
-yay -Syu --noconfirm --sudoflags "env OMARCHY_ALLOW_DIRECT_PACMAN=1" || exit $?
+yay -Syu --noconfirm --answerclean None --answerdiff None --answerupgrade None --sudoflags "env OMARCHY_ALLOW_DIRECT_PACMAN=1" || exit $?
 
 step "mise (dev tools)"
 mise upgrade -y || exit $?
