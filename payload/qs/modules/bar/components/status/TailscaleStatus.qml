@@ -13,7 +13,7 @@ MaterialIcon {
     property color colour: Colours.palette.m3secondary
 
     text: "device_hub"
-    color: connected ? colour : Colours.palette.m3outline
+    color: colour
     fontStyle: Tokens.font.icon.medium
     fill: connected ? 1 : 0
 
