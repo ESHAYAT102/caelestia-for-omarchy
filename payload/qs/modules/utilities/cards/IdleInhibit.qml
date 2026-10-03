@@ -64,7 +64,7 @@ StyledRect {
 
         StyledSwitch {
             checked: IdleInhibitor.effectiveEnabled
-            onToggled: IdleInhibitor.enabled = checked
+            onToggled: checked ? IdleInhibitor.turnOn() : IdleInhibitor.turnOff()
         }
     }
 
