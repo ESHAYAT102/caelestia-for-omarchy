@@ -5,6 +5,8 @@ import Caelestia
 import Caelestia.Config
 import qs.components
 import qs.components.controls
+import qs.components.effects
+import qs.components.images
 import qs.services
 import qs.modules.launcher.services
 
@@ -17,6 +19,7 @@ Item {
 
     readonly property int padding: Tokens.padding.large
     readonly property int rounding: Tokens.rounding.extraLarge
+    readonly property string clipboardPreviewPath: list.currentList?.selectedImagePath ?? ""
 
     implicitWidth: listWrapper.width + padding * 2
     implicitHeight: search.height + listWrapper.height + padding + search.anchors.bottomMargin
@@ -41,6 +44,46 @@ Item {
             search: search
             padding: root.padding
             rounding: root.rounding
+        }
+    }
+
+    Item {
+        id: clipboardPreview
+
+        readonly property real previewWidth: root.width * 0.9
+
+        anchors.left: parent.right
+        anchors.leftMargin: Tokens.spacing.large
+        anchors.bottom: parent.bottom
+        implicitWidth: root.clipboardPreviewPath.length > 0 ? previewWidth : 0
+        implicitHeight: root.clipboardPreviewPath.length > 0 ? Math.round(previewWidth * 9 / 16) : 0
+        opacity: root.clipboardPreviewPath.length > 0 ? 1 : 0
+        scale: root.clipboardPreviewPath.length > 0 ? 1 : 0.96
+        visible: opacity > 0
+
+        Behavior on opacity {
+            Anim { type: Anim.DefaultEffects }
+        }
+        Behavior on scale {
+            Anim { type: Anim.DefaultEffects }
+        }
+
+        Elevation {
+            anchors.fill: panel
+            radius: panel.radius
+            level: 3
+        }
+
+        StyledClippingRect {
+            id: panel
+            anchors.fill: parent
+            radius: Tokens.rounding.extraLarge
+            color: Colours.tPalette.m3surfaceContainer
+
+            CachingImage {
+                anchors.fill: parent
+                path: root.clipboardPreviewPath
+            }
         }
     }
 
@@ -104,7 +147,7 @@ Item {
                 if (event.key === Qt.Key_Delete && event.modifiers & Qt.ShiftModifier) {
                     list.currentList?.clearHistory();
                     event.accepted = true;
-                } else if (event.key === Qt.Key_Delete) {
+                } else if (event.key === Qt.Key_Delete && event.modifiers & Qt.ControlModifier) {
                     list.currentList?.deleteEntry(list.currentList?.currentItem?.modelData ?? null);
                     event.accepted = true;
                 }

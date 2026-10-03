@@ -19,6 +19,7 @@ StyledListView {
     property var entries: []
     property int selected: 0
     property int historyRevision: 0
+    property string selectedImagePath
 
     function loadHistory(): void {
         historyProcess.running = true;
@@ -27,6 +28,8 @@ StyledListView {
     function activate(): void {
         copyEntry(currentItem?.modelData ?? null);
     }
+
+    onCurrentItemChanged: selectedImagePath = currentItem?.modelData?.type === "image" ? currentItem.modelData.path : ""
 
     function copyEntry(entry: var): void {
         if (!entry)
@@ -70,7 +73,7 @@ StyledListView {
 
     spacing: Tokens.spacing.small
     orientation: Qt.Vertical
-    implicitHeight: count > 0 ? Math.min(contentHeight, (Tokens.sizes.launcher.itemHeight + spacing) * Config.launcher.maxShown - spacing) : Tokens.sizes.launcher.itemHeight
+    implicitHeight: count > 0 ? (Tokens.sizes.launcher.itemHeight + spacing) * Math.min(Config.launcher.maxShown, count) - spacing : Tokens.sizes.launcher.itemHeight
     preferredHighlightBegin: 0
     preferredHighlightEnd: height
     highlightRangeMode: ListView.ApplyRange
@@ -94,14 +97,9 @@ StyledListView {
         id: row
         required property var modelData
         required property int index
-        readonly property bool expanded: modelData.type === "image" && ListView.isCurrentItem
-        implicitHeight: expanded ? Tokens.sizes.launcher.itemHeight * 3.25 : Tokens.sizes.launcher.itemHeight
+        implicitHeight: Tokens.sizes.launcher.itemHeight
         anchors.left: parent?.left
         anchors.right: parent?.right
-
-        Behavior on implicitHeight {
-            Anim {}
-        }
 
         StateLayer {
             radius: Tokens.rounding.large
@@ -114,14 +112,10 @@ StyledListView {
             anchors.left: parent.left
             anchors.leftMargin: Tokens.padding.medium
             anchors.verticalCenter: parent.verticalCenter
-            width: row.expanded ? Math.min(Math.round(height * 16 / 9), row.width * 0.64) : Math.round(height * 1.5)
+            width: Math.round(height * 1.5)
             height: parent.height - Tokens.padding.small * 2
-            radius: row.expanded ? Tokens.rounding.medium : Tokens.rounding.small
+            radius: Tokens.rounding.small
             color: Colours.tPalette.m3surfaceContainerHigh
-
-            Behavior on width {
-                Anim {}
-            }
 
             CachingImage {
                 anchors.fill: parent
