@@ -371,7 +371,7 @@ else
   cat >>"$BINDINGS" <<'LUA'
 
 -- >>> caelestia-on-omarchy >>>
--- Caelestia's panels. SUPER + D/A/U are Hyprland DBus global shortcuts (appid
+-- Caelestia's panels. SUPER + A/U are Hyprland DBus global shortcuts (appid
 -- "caelestia"); `hyprctl globalshortcuts` lists all 21, the rest stay unbound.
 --
 -- The launcher is the one exception: it goes through Caelestia's `drawers` IPC,
@@ -385,7 +385,6 @@ else
 hl.unbind("ALT + SPACE")
 o.bind("ALT + SPACE", "App launcher",
   "qs -p $HOME/.local/share/caelestia-shell/qs ipc call drawers toggle launcher")
-o.bind("SUPER + D", "Dashboard", hl.dsp.global("caelestia:dashboard"))
 o.bind("SUPER + A", "Sidebar", hl.dsp.global("caelestia:sidebar"))
 o.bind("SUPER + U", "Utilities", hl.dsp.global("caelestia:utilities"))
 
@@ -499,7 +498,7 @@ if ((DRY)); then
 else
   say $'\033[32mInstalled.\033[0m'
   say ""
-  say "  ALT + SPACE          launcher        SUPER + D  dashboard"
+  say "  ALT + SPACE          launcher"
   say "  SUPER + A  sidebar   SUPER + U  utilities"
   say "  SUPER + CTRL + L     lock (Caelestia's, via caelestia-lock)"
   say ""

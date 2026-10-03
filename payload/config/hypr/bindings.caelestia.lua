@@ -187,7 +187,7 @@ o.bind("XF86Display", "Caelestia dashboard",
   "qs -p $HOME/.local/share/caelestia-shell/qs ipc call drawers openDashboardTab dashboard")
 
 -- >>> caelestia-on-omarchy >>>
--- Caelestia's panels. SUPER + D/A/U are Hyprland DBus global shortcuts (appid
+-- Caelestia's panels. SUPER + A/U are Hyprland DBus global shortcuts (appid
 -- "caelestia"); `hyprctl globalshortcuts` lists all 21, the rest stay unbound.
 --
 -- The launcher is the one exception: it goes through Caelestia's `drawers` IPC,
@@ -251,7 +251,6 @@ o.bind("XF86MonBrightnessUp", "Brightness up",
   "qs -p $HOME/.local/share/caelestia-shell/qs ipc call brightness set +5%", repeat_locked)
 o.bind("XF86MonBrightnessDown", "Brightness down",
   "qs -p $HOME/.local/share/caelestia-shell/qs ipc call brightness set 5%-", repeat_locked)
-o.bind("SUPER + D", "Dashboard", hl.dsp.global("caelestia:dashboard"))
 o.bind("SUPER + A", "Sidebar", hl.dsp.global("caelestia:sidebar"))
 o.bind("SUPER + U", "Utilities", hl.dsp.global("caelestia:utilities"))
 
