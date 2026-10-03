@@ -13,20 +13,16 @@ import qs.services
 ColumnLayout {
     id: root
 
-    property var omarchyUpdates: []
-    property var repoUpdates: []
-    property var aurUpdates: []
+    property var updates: []
     property bool loading
-    readonly property var updates: omarchyUpdates.concat(repoUpdates, aurUpdates)
-
-    width: Math.round(Tokens.sizes.bar.networkWidth * 1.35)
-    spacing: Tokens.spacing.medium
 
     function refresh(): void {
         loading = true;
-        Quickshell.execDetached(["qs", "-p", "/usr/share/omarchy/shell", "ipc", "call", "gennaro.updater", "refresh"]);
-        delay.restart();
+        queryProcess.running = true;
     }
+
+    width: Math.round(Tokens.sizes.bar.networkWidth * 1.35)
+    spacing: Tokens.spacing.medium
 
     Component.onCompleted: refresh()
 
@@ -99,7 +95,7 @@ ColumnLayout {
                             }
 
                             StyledText {
-                                text: `${modelData.old} → ${modelData.new}`
+                                text: `${modelData.source} ${modelData.old} → ${modelData.new}`
                                 color: Colours.palette.m3onSurfaceVariant
                                 font: Tokens.font.label.small
                                 elide: Text.ElideRight
@@ -118,29 +114,18 @@ ColumnLayout {
         text: qsTr("Update")
         inactiveColour: Colours.palette.m3primaryContainer
         inactiveOnColour: Colours.palette.m3onPrimaryContainer
-        onClicked: Quickshell.execDetached(["omarchy-launch-floating-terminal-with-presentation", "omarchy-update"])
-    }
-
-    Timer {
-        id: delay
-        interval: 1200
-        onTriggered: queryProcess.running = true
+        onClicked: Quickshell.execDetached(["omarchy-launch-floating-terminal-with-presentation", "caelestia-update-all"])
     }
 
     Process {
         id: queryProcess
-        command: ["bash", "-lc", "qs -p /usr/share/omarchy/shell ipc call gennaro.updater query 2>/dev/null || printf '{\"omarchy\":[],\"repo\":[],\"aur\":[]}'"]
+        command: ["caelestia-check-updates"]
         stdout: StdioCollector {
             onStreamFinished: {
                 try {
-                    const data = JSON.parse(text);
-                    root.omarchyUpdates = data.omarchy ?? [];
-                    root.repoUpdates = data.repo ?? [];
-                    root.aurUpdates = data.aur ?? [];
+                    root.updates = JSON.parse(text);
                 } catch (error) {
-                    root.omarchyUpdates = [];
-                    root.repoUpdates = [];
-                    root.aurUpdates = [];
+                    root.updates = [];
                 }
                 root.loading = false;
             }

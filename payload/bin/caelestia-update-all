@@ -1,0 +1,29 @@
+#!/bin/bash
+#
+# Update everything: pacman repo packages, AUR packages via yay,
+# mise-managed dev tools and all flatpaks. Each step runs interactively
+# so packages can be reviewed; the chain stops if a step fails.
+
+set -u
+
+# One password prompt up front; the cached credential covers the sudo calls
+# in every step below.
+sudo -v || exit $?
+
+step() {
+  printf '\n=== %s ===\n' "$1"
+}
+
+step "pacman (system packages)"
+sudo env OMARCHY_ALLOW_DIRECT_PACMAN=1 pacman -Syu --noconfirm || exit $?
+
+step "yay (AUR packages)"
+yay -Syu --noconfirm --nodiffmenu --noeditmenu --nocleanmenu --sudoflags "env OMARCHY_ALLOW_DIRECT_PACMAN=1" || exit $?
+
+step "mise (dev tools)"
+mise upgrade -y || exit $?
+
+step "flatpak"
+flatpak update -y || exit $?
+
+printf '\nAll updates finished.\n'
