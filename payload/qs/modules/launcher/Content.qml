@@ -5,8 +5,6 @@ import Caelestia
 import Caelestia.Config
 import qs.components
 import qs.components.controls
-import qs.components.effects
-import qs.components.images
 import qs.services
 import qs.modules.launcher.services
 
@@ -47,46 +45,6 @@ Item {
         }
     }
 
-    Item {
-        id: clipboardPreview
-
-        readonly property real previewWidth: root.width * 0.9
-
-        anchors.left: parent.right
-        anchors.leftMargin: Tokens.spacing.large
-        anchors.bottom: parent.bottom
-        implicitWidth: root.clipboardPreviewPath.length > 0 ? previewWidth : 0
-        implicitHeight: root.clipboardPreviewPath.length > 0 ? Math.round(previewWidth * 9 / 16) : 0
-        opacity: root.clipboardPreviewPath.length > 0 ? 1 : 0
-        scale: root.clipboardPreviewPath.length > 0 ? 1 : 0.96
-        visible: opacity > 0
-
-        Behavior on opacity {
-            Anim { type: Anim.DefaultEffects }
-        }
-        Behavior on scale {
-            Anim { type: Anim.DefaultEffects }
-        }
-
-        Elevation {
-            anchors.fill: panel
-            radius: panel.radius
-            level: 3
-        }
-
-        StyledClippingRect {
-            id: panel
-            anchors.fill: parent
-            radius: Tokens.rounding.extraLarge
-            color: Colours.tPalette.m3surfaceContainer
-
-            CachingImage {
-                anchors.fill: parent
-                path: root.clipboardPreviewPath
-            }
-        }
-    }
-
     SearchBar {
         id: search
 
@@ -101,7 +59,7 @@ Item {
         topPadding: Math.round((Tokens.padding.medium + Tokens.padding.large) / 2)
         bottomPadding: Math.round((Tokens.padding.medium + Tokens.padding.large) / 2)
 
-        placeholderText: qsTr("Type \"%1\" for commands").arg(GlobalConfig.launcher.actionPrefix)
+        placeholderText: qsTr("Type \"%1\" for commands, \":\" for the Omarchy menu").arg(GlobalConfig.launcher.actionPrefix)
 
         onAccepted: {
             if (list.showUnlocks) {
@@ -112,7 +70,7 @@ Item {
                 list.currentList?.activate(false);
                 return;
             }
-            if (list.showClipboard || list.showKeybindings) {
+            if (list.showClipboard || list.showKeybindings || list.showMenu) {
                 list.currentList?.activate();
                 return;
             }
@@ -164,6 +122,15 @@ Item {
                 return;
             if (list.showUnlocks) {
                 if (event.key === Qt.Key_Delete && event.modifiers & Qt.ShiftModifier) {
+                    event.accepted = true;
+                }
+                return;
+            }
+            if (list.showMenu) {
+                // At the top of the menu Backspace is left alone, so it eats
+                // the ":"; deeper in it climbs back out of the submenu.
+                if ((event.key === Qt.Key_Backspace || event.key === Qt.Key_Left) && (search.text !== MenuService.menuPrefix || MenuService.menuPath !== "root")) {
+                    list.currentList?.goBack();
                     event.accepted = true;
                 }
                 return;

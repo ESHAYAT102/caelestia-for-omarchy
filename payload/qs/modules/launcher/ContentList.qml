@@ -23,9 +23,10 @@ Item {
     readonly property bool showClipboard: search.text.startsWith(`${GlobalConfig.launcher.actionPrefix}clipboard`)
     readonly property bool showKeybindings: search.text.startsWith(`${GlobalConfig.launcher.actionPrefix}keybindings`)
     readonly property bool showEmojis: search.text.startsWith(`${GlobalConfig.launcher.actionPrefix}emoji`)
+    readonly property bool showMenu: search.text.startsWith(":")
     readonly property bool showSpecialList: showWallpapers || showUnlocks
-    readonly property var currentList: showSpecialList ? specialList.item : showClipboard ? clipboardList.item : showKeybindings ? keybindingsList.item : showEmojis ? emojiList.item : appList.item
-    property string animState: showWallpapers ? "wallpapers" : showUnlocks ? "unlocks" : showClipboard ? "clipboard" : showKeybindings ? "keybindings" : showEmojis ? "emojis" : "apps"
+    readonly property var currentList: showSpecialList ? specialList.item : showClipboard ? clipboardList.item : showKeybindings ? keybindingsList.item : showEmojis ? emojiList.item : showMenu ? menuList.item : appList.item
+    property string animState: showWallpapers ? "wallpapers" : showUnlocks ? "unlocks" : showClipboard ? "clipboard" : showKeybindings ? "keybindings" : showEmojis ? "emojis" : showMenu ? "menu" : "apps"
 
     anchors.horizontalCenter: parent.horizontalCenter
     anchors.bottom: parent.bottom
@@ -44,6 +45,7 @@ Item {
                 clipboardList.active: false
                 keybindingsList.active: false
                 emojiList.active: false
+                menuList.active: false
                 specialList.active: false
             }
 
@@ -62,6 +64,7 @@ Item {
                 clipboardList.active: false
                 keybindingsList.active: false
                 emojiList.active: false
+                menuList.active: false
                 appList.active: false
             }
         },
@@ -75,6 +78,7 @@ Item {
                 clipboardList.active: false
                 keybindingsList.active: false
                 emojiList.active: false
+                menuList.active: false
                 appList.active: false
             }
         },
@@ -87,6 +91,7 @@ Item {
                 clipboardList.active: true
                 keybindingsList.active: false
                 emojiList.active: false
+                menuList.active: false
                 appList.active: false
                 specialList.active: false
             }
@@ -105,6 +110,7 @@ Item {
                 keybindingsList.active: true
                 emojiList.active: false
                 clipboardList.active: false
+                menuList.active: false
                 appList.active: false
                 specialList.active: false
             }
@@ -121,6 +127,26 @@ Item {
                 root.implicitWidth: root.Tokens.sizes.launcher.itemWidth
                 root.implicitHeight: Math.min(root.maxHeight, emojiList.implicitHeight)
                 emojiList.active: true
+                keybindingsList.active: false
+                clipboardList.active: false
+                menuList.active: false
+                appList.active: false
+                specialList.active: false
+            }
+
+            AnchorChanges {
+                anchors.left: root.parent.left
+                anchors.right: root.parent.right
+            }
+        },
+        State {
+            name: "menu"
+
+            PropertyChanges {
+                root.implicitWidth: root.Tokens.sizes.launcher.itemWidth
+                root.implicitHeight: Math.min(root.maxHeight, menuList.implicitHeight)
+                menuList.active: true
+                emojiList.active: false
                 keybindingsList.active: false
                 clipboardList.active: false
                 appList.active: false
@@ -198,6 +224,18 @@ Item {
         anchors.fill: parent
         sourceComponent: EmojiList {
             objectName: "launcherEmojiList"
+            search: root.search
+            screenState: root.screenState
+        }
+    }
+
+    Loader {
+        id: menuList
+
+        active: false
+        anchors.fill: parent
+        sourceComponent: MenuList {
+            objectName: "launcherMenuList"
             search: root.search
             screenState: root.screenState
         }
