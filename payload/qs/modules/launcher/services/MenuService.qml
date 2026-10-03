@@ -84,6 +84,30 @@ QtObject {
             Quickshell.execDetached(["systemd-run", "--user", "--scope", "--quiet", "--collect", "--", "bash", "-lc", String(action)]);
     }
 
+    // Screen-grabbing actions (screenshot, text extractor, color picker)
+    // must not fire while the launcher still covers the screen. The caller
+    // closes the launcher first; this fires the action once the drawer is
+    // gone. It lives here (not in the list) because the list is destroyed
+    // when the launcher closes and clears the search.
+    property var pendingAction: null
+
+    property Timer runDelay: Timer {
+        interval: 300
+        onTriggered: {
+            if (root.pendingAction) {
+                root.run(root.pendingAction);
+                root.pendingAction = null;
+            }
+        }
+    }
+
+    function runAfterClose(action: var): void {
+        if (!action)
+            return;
+        root.pendingAction = action;
+        runDelay.restart();
+    }
+
     function quote(value: string): string {
         return "'" + String(value || "").replace(/'/g, "'\\''") + "'";
     }

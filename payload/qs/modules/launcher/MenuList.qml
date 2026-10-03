@@ -34,10 +34,11 @@ StyledListView {
             const entry = DesktopEntries.byId(row.appId);
             if (entry)
                 Apps.launch(entry);
+            screenState.launcher = false;
         } else {
-            MenuService.run(row.action);
+            MenuService.runAfterClose(row.action);
+            screenState.launcher = false;
         }
-        screenState.launcher = false;
     }
 
     function activate(): void {
