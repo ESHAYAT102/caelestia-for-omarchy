@@ -45,7 +45,7 @@ StyledListView {
         if (!entry)
             return;
         const file = Quickshell.env("HOME") + "/.local/state/omarchy/clipboard-history.json";
-        deleteProcess.command = ["python", "-c", "import json,sys; p=sys.argv[1]; i=int(sys.argv[2]); d=json.load(open(p)); d.pop(i,None); open(p,'w').write(json.dumps(d,ensure_ascii=False)+'\\n')", file, String(entry.index)];
+        deleteProcess.command = ["python", "-c", "import json,os,sys; p=sys.argv[1]; i=int(sys.argv[2]); d=json.load(open(p)); e=d.pop(i); open(p,'w').write(json.dumps(d,ensure_ascii=False)+'\\n'); image=e.get('path','') if e.get('type')=='image' else ''; image and not any(x.get('path')==image for x in d) and os.path.isfile(image) and os.remove(image)", file, String(entry.index)];
         deleteProcess.running = true;
     }
 
@@ -146,6 +146,7 @@ StyledListView {
 
         MaterialIcon {
             id: deleteIcon
+            z: 2
             anchors.right: parent.right
             anchors.rightMargin: Tokens.padding.medium
             anchors.verticalCenter: parent.verticalCenter
@@ -154,7 +155,11 @@ StyledListView {
 
             MouseArea {
                 anchors.fill: parent
-                onClicked: root.deleteEntry(row.modelData)
+                cursorShape: Qt.PointingHandCursor
+                onClicked: mouse => {
+                    mouse.accepted = true;
+                    root.deleteEntry(row.modelData);
+                }
             }
         }
     }
