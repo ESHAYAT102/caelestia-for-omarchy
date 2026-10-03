@@ -188,6 +188,14 @@ StyledWindow {
         }
 
         PanelBg {
+            id: clipboardPreviewBg
+
+            panel: panels.clipboardPreview
+            deformAmount: 0.05
+            exclude: [launcherBg]
+        }
+
+        PanelBg {
             id: sessionBg
 
             panel: panels.sessionWrapper
