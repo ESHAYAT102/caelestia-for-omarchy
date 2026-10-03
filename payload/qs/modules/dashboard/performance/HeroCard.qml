@@ -94,6 +94,7 @@ StyledRect {
 
             StyledText {
                 text: `${Math.ceil(GlobalConfig.services.useFahrenheitPerformance ? root.temperature * 1.8 + 32 : root.temperature)}°${GlobalConfig.services.useFahrenheitPerformance ? "F" : "C"}`
+                color: root.temperature > 90 ? Colours.palette.m3error : Colours.palette.m3onSurface
                 font: Tokens.font.body.builders.medium.build()
             }
         }
