@@ -10,15 +10,11 @@ import qs.services
 Item {
     id: root
 
-    property int pending
-
     required property var bar
 
     implicitWidth: icon.implicitHeight + Tokens.padding.small
     implicitHeight: icon.implicitHeight
     visible: true
-
-    Component.onCompleted: refreshTimer.triggered()
 
     StateLayer {
         anchors.fill: undefined
@@ -46,29 +42,9 @@ Item {
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
         text: ""
-        color: Colours.palette.m3primary
+        color: UpdateChecker.count > 0 ? Colours.palette.m3primary : Colours.palette.m3onSurfaceVariant
         font.family: "CaskaydiaCove Nerd Font"
         font.pixelSize: Tokens.font.icon.small.pointSize
         font.weight: Font.Bold
-    }
-
-    Timer {
-        id: refreshTimer
-        interval: 60000
-        running: true
-        repeat: true
-        triggeredOnStart: true
-        onTriggered: updateProcess.running = true
-    }
-
-    Process {
-        id: updateProcess
-        command: ["bash", "-lc", "qs -p /usr/share/omarchy/shell ipc call gennaro.updater query 2>/dev/null || printf '{\"pending\":0}'"]
-        stdout: StdioCollector {
-            onStreamFinished: {
-                try { root.pending = JSON.parse(text).pending ?? 0; }
-                catch (error) { root.pending = 0; }
-            }
-        }
     }
 }

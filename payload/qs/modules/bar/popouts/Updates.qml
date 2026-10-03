@@ -13,12 +13,11 @@ import qs.services
 ColumnLayout {
     id: root
 
-    property var updates: []
-    property bool loading
+    readonly property var updates: UpdateChecker.updates
+    readonly property bool loading: UpdateChecker.loading
 
     function refresh(): void {
-        loading = true;
-        queryProcess.running = true;
+        UpdateChecker.refresh();
     }
 
     width: Math.round(Tokens.sizes.bar.networkWidth * 1.35)
@@ -115,20 +114,5 @@ ColumnLayout {
         inactiveColour: Colours.palette.m3primaryContainer
         inactiveOnColour: Colours.palette.m3onPrimaryContainer
         onClicked: Quickshell.execDetached(["omarchy-launch-floating-terminal-with-presentation", "caelestia-update-all"])
-    }
-
-    Process {
-        id: queryProcess
-        command: ["caelestia-check-updates"]
-        stdout: StdioCollector {
-            onStreamFinished: {
-                try {
-                    root.updates = JSON.parse(text);
-                } catch (error) {
-                    root.updates = [];
-                }
-                root.loading = false;
-            }
-        }
     }
 }
