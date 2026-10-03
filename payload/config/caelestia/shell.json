@@ -42,10 +42,6 @@
             },
             {
                 "enabled": true,
-                "id": "updates"
-            },
-            {
-                "enabled": true,
                 "id": "spacer"
             },
             {
@@ -70,7 +66,7 @@
             },
             {
                 "enabled": true,
-                "id": "power"
+                "id": "updates"
             }
         ],
         "persistent": true,

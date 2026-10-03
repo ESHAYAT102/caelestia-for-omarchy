@@ -142,6 +142,7 @@ ColumnLayout {
                 delegate: EntryWrapper {
                     UpdateIndicator {
                         objectName: "taskbarUpdateIndicator"
+                        bar: root
                     }
                 }
             }
@@ -179,15 +180,7 @@ ColumnLayout {
                     }
                 }
             }
-            DelegateChoice {
-                roleValue: "power"
-                delegate: EntryWrapper {
-                    Power {
-                        objectName: "taskbarPowerButton"
-                        screenState: root.screenState
-                    }
-                }
-            }
+
         }
     }
 

@@ -12,9 +12,11 @@ Item {
 
     property int pending
 
-    implicitWidth: pending > 0 ? icon.implicitHeight + Tokens.padding.small : 0
+    required property var bar
+
+    implicitWidth: icon.implicitHeight + Tokens.padding.small
     implicitHeight: icon.implicitHeight
-    visible: pending > 0
+    visible: true
 
     Component.onCompleted: refreshTimer.triggered()
 
@@ -24,15 +26,30 @@ Item {
         implicitWidth: implicitHeight
         implicitHeight: icon.implicitHeight + Tokens.padding.small
         radius: Tokens.rounding.full
-        onClicked: Quickshell.execDetached(["omarchy-launch-floating-terminal-with-presentation", "omarchy-update"])
+        onClicked: {
+            const popouts = root.bar.popouts;
+            if (popouts.hasCurrent && popouts.currentName === "updates")
+                popouts.close();
+            else {
+                popouts.currentName = "updates";
+                popouts.currentCenter = Qt.binding(() => root.mapToItem(root.bar, 0, root.implicitHeight / 2).y);
+                popouts.hasCurrent = true;
+            }
+        }
     }
 
-    MaterialIcon {
+    StyledText {
         id: icon
         anchors.centerIn: parent
-        text: "deployed_code"
+        anchors.horizontalCenterOffset: -1
+        anchors.verticalCenterOffset: 0
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
+        text: ""
         color: Colours.palette.m3primary
-        fontStyle: Tokens.font.icon.builders.small.weight(Font.Bold).build()
+        font.family: "CaskaydiaCove Nerd Font"
+        font.pixelSize: Tokens.font.icon.small.pointSize
+        font.weight: Font.Bold
     }
 
     Timer {

@@ -103,6 +103,11 @@ Item {
         }
 
         Popout {
+            name: "updates"
+            sourceComponent: Updates {}
+        }
+
+        Popout {
             name: "audio"
             sourceComponent: AudioPopout {
                 popouts: root.popouts
