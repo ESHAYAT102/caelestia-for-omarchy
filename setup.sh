@@ -56,8 +56,41 @@ for retired in \
   rm -f "$QSDIR/$retired"
 done
 
-sed "s#/home/esh#$HOME#g" "$ROOT/payload/config/caelestia/shell.json" > "$HOME/.config/caelestia/shell.json"
-install_payload "$ROOT/payload/config/caelestia/shell-tokens.json" "$HOME/.config/caelestia/shell-tokens.json"
+merge_json_preserving_user() {
+  local src="$1" dst="$2"
+  if [[ -f $dst ]]; then
+    local tmp
+    tmp="$(mktemp)"
+    sed "s#/home/esh#$HOME#g" "$src" > "$tmp.src"
+    python3 - "$tmp.src" "$dst" <<'PY' > "$tmp.merged"
+import json, sys
+with open(sys.argv[1]) as f:
+    base = json.load(f)
+try:
+    with open(sys.argv[2]) as f:
+        user = json.load(f)
+except (OSError, ValueError):
+    user = {}
+def merge(b, u):
+    if isinstance(b, dict) and isinstance(u, dict):
+        out = dict(b)
+        for k, v in u.items():
+            out[k] = merge(b[k], v) if k in b else v
+        return out
+    return u
+json.dump(merge(base, user), open(sys.argv[1] + ".tmp", "w"), indent=4)
+with open(sys.argv[1] + ".tmp") as f:
+    sys.stdout.write(f.read())
+PY
+    mv "$tmp.merged" "$dst"
+    rm -f "$tmp.src" "$tmp.src.tmp" "$tmp.merged" "$tmp"
+  else
+    sed "s#/home/esh#$HOME#g" "$src" > "$dst"
+  fi
+}
+
+merge_json_preserving_user "$ROOT/payload/config/caelestia/shell.json" "$HOME/.config/caelestia/shell.json"
+merge_json_preserving_user "$ROOT/payload/config/caelestia/shell-tokens.json" "$HOME/.config/caelestia/shell-tokens.json"
 
 if [[ ! -d $PREFIX/cli-src/.git ]]; then
   git clone -q "${CAELESTIA_CLI_REPO:-https://github.com/caelestia-dots/cli.git}" "$PREFIX/cli-src"
