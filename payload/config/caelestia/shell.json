@@ -139,7 +139,7 @@
             ]
         },
         "idle": {
-            "inhibitWhenAudio": false,
+            "inhibitWhenAudio": true,
             "lockBeforeSleep": false,
             "timeouts": [
                 {
