@@ -42,7 +42,7 @@ Item {
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
         text: ""
-        color: UpdateChecker.count > 0 ? Colours.palette.m3primary : Colours.palette.m3onSurfaceVariant
+        color: UpdateChecker.count > 0 ? Colours.palette.m3error : Colours.palette.m3onSurfaceVariant
         font.family: "CaskaydiaCove Nerd Font"
         font.pixelSize: Tokens.font.icon.small.pointSize
         font.weight: Font.Bold
