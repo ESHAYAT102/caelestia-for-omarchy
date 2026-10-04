@@ -195,7 +195,6 @@ PageBase {
         }
 
         SliderRow {
-            last: true
             icon: "zoom_out_map"
             label: qsTr("UI scale")
             value: Config.appearance.spacing.scale
@@ -207,6 +206,37 @@ PageBase {
                 GlobalConfig.appearance.spacing.scale = scale;
                 TokenConfig.sizes.bar.innerWidth = Math.round(31 * scale);
             }
+        }
+
+        SliderRow {
+            Layout.topMargin: Tokens.spacing.extraSmall / 2 - parent.spacing
+
+            icon: "border_outer"
+            label: qsTr("Border thickness")
+            value: Config.border.thickness / 20
+            valueLabel: `${Math.round(value * 20)}px`
+            onMoved: v => GlobalConfig.border.thickness = Math.round(v * 20)
+        }
+
+        SliderRow {
+            Layout.topMargin: Tokens.spacing.extraSmall / 2 - parent.spacing
+
+            icon: "rounded_corner"
+            label: qsTr("Border rounding")
+            value: Config.border.rounding / 40
+            valueLabel: `${Math.round(value * 40)}px`
+            onMoved: v => GlobalConfig.border.rounding = Math.round(v * 40)
+        }
+
+        SliderRow {
+            last: true
+            Layout.topMargin: Tokens.spacing.extraSmall / 2 - parent.spacing
+
+            icon: "blur_on"
+            label: qsTr("Border smoothing")
+            value: Config.border.smoothing / 40
+            valueLabel: `${Math.round(value * 40)}px`
+            onMoved: v => GlobalConfig.border.smoothing = Math.round(v * 40)
         }
     }
 }

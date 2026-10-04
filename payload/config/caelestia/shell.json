@@ -2,16 +2,16 @@
     "appearance": {
         "deformScale": 0,
         "font": {
-            "scale": 0.8
+            "scale": 0.72
         },
         "padding": {
-            "scale": 0.8
+            "scale": 0.72
         },
         "rounding": {
-            "scale": 0.8
+            "scale": 0.72
         },
         "spacing": {
-            "scale": 0.8
+            "scale": 0.72
         },
         "transparency": {
             "enabled": true
@@ -125,7 +125,7 @@
     "border": {
         "rounding": 20,
         "smoothing": 20,
-        "thickness": 10
+        "thickness": 6
     },
     "general": {
         "apps": {

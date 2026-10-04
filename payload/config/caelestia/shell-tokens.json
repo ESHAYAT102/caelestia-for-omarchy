@@ -1,7 +1,7 @@
 {
     "sizes": {
         "bar": {
-            "innerWidth": 25,
+            "innerWidth": 22,
             "windowPreviewSize": 250,
             "trayMenuWidth": 188,
             "batteryWidth": 240,
