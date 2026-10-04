@@ -12,15 +12,15 @@ Item {
 
     required property var bar
 
-    implicitWidth: icon.implicitHeight + Tokens.padding.small
-    implicitHeight: icon.implicitHeight
+    implicitWidth: icon.implicitHeight + Tokens.padding.small * 2
+    implicitHeight: icon.implicitHeight + Tokens.padding.small
     visible: true
 
     StateLayer {
         anchors.fill: undefined
         anchors.centerIn: parent
         implicitWidth: implicitHeight
-        implicitHeight: icon.implicitHeight + Tokens.padding.small
+        implicitHeight: icon.implicitHeight + Tokens.padding.small * 2
         radius: Tokens.rounding.full
         onClicked: {
             const popouts = root.bar.popouts;
@@ -37,7 +37,7 @@ Item {
     StyledText {
         id: icon
         anchors.centerIn: parent
-        anchors.horizontalCenterOffset: -2.5
+        anchors.horizontalCenterOffset: -1.5
         anchors.verticalCenterOffset: 0
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
