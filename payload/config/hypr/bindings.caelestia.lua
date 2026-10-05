@@ -100,6 +100,13 @@ bind("SUPER + K", "Keybindings",
   "$HOME/.local/bin/caelestia-launcher-type '>keybindings '")
 
 bind("SUPER + L", "Lock screen", "$HOME/.config/omarchy/bridges/caelestia/caelestia-lock")
+-- Lid close locks with Caelestia, not Omarchy: replace the default
+-- switch binding (omarchy-system-lid-close calls omarchy-system-lock) but
+-- keep its clamshell logic and display reconcile. The Omarchy profile has
+-- no override, so the stock binding returns when Caelestia mode is off.
+hl.unbind("switch:on:Lid Switch")
+bind("switch:on:Lid Switch", "Lock on lid close (Caelestia)",
+  "bash -lc 'if omarchy-hw-laptop-closed && ! omarchy-hw-external-monitors; then $HOME/.config/omarchy/bridges/caelestia/caelestia-lock >/dev/null 2>&1; fi; omarchy-hyprland-monitor-clamshell'", { locked = true })
 bind("SUPER + SHIFT + L", "Screensaver", "omarchy-launch-screensaver")
 bind("SUPER + RETURN", "Terminal", [[uwsm app -- $TERMINAL --working-directory="$(omarchy-cmd-terminal-cwd)"]])
 
