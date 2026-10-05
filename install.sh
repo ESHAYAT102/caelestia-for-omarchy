@@ -314,8 +314,8 @@ rm -f "$tmpcfg"
 step "7. Omarchy's shell.json — bar, plugins and idle, merged"
 # Mirrors what caelestia-mode on writes, so setup.sh (step 12) does not undo
 # this merge and the verify step agrees with it:
-#   bar.id           omarchy.bar, hidden at runtime via the bar-off toggle
-#                    (caelestia-mode on runs `omarchy-toggle bar-off on`)
+#   bar.id           thepiratefox.nullbar, which renders nothing (caelestia-mode
+#                    on also leaves the bar-off toggle off)
 #   bar.position     left, Caelestia's edge
 #   disabledPlugins  omarchy.osd (or both OSDs fire), omarchy.notifications
 #                    and esh.notification-center (Caelestia owns the bus)
@@ -480,8 +480,8 @@ else
   ck "notification bus owner" "$CAELESTIA_QSDIR" \
      "$(busctl --user status org.freedesktop.Notifications 2>/dev/null | sed -n 's/.*-p //p')"
   ck "omarchy-shell ping" "ok" "$(omarchy-shell shell ping 2>&1)"
-  ck "bar.id" "omarchy.bar" "$(jq -r '.bar.id // ""' "$OMARCHY_SHELL_JSON" 2>/dev/null)"
-  ck "bar-off toggle" "on" "$([[ -f $HOME/.local/state/omarchy/toggles/bar-off ]] && echo on || echo off)"
+  ck "bar.id" "thepiratefox.nullbar" "$(jq -r '.bar.id // ""' "$OMARCHY_SHELL_JSON" 2>/dev/null)"
+  ck "bar-off toggle" "off" "$([[ -f $HOME/.local/state/omarchy/toggles/bar-off ]] && echo on || echo off)"
   ck_at_least "caelestia drawers" "1" "$(hyprctl layers 2>/dev/null | grep -c 'namespace: caelestia-drawers')"
   ck "caelestia-shell.service" "active" "$(systemctl --user is-active caelestia-shell.service 2>&1)"
 fi

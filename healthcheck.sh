@@ -44,8 +44,8 @@ if [[ $mode == caelestia ]]; then
   ck "quickshell processes" "2" "$(pgrep -cx quickshell)"
   ck "Caelestia unit" "active" "$(systemctl --user is-active caelestia-shell.service 2>&1)"
   ck "Caelestia enabled" "enabled" "$(systemctl --user is-enabled caelestia-shell.service 2>&1)"
-  ck "bar plugin" "omarchy.bar" "$(jq -r '.bar.id // ""' "$HOME/.config/omarchy/shell.json")"
-  ck "bar-off toggle" "on" "$([[ -f $HOME/.local/state/omarchy/toggles/bar-off ]] && echo on || echo off)"
+  ck "bar plugin" "thepiratefox.nullbar" "$(jq -r '.bar.id // ""' "$HOME/.config/omarchy/shell.json")"
+  ck "bar-off toggle" "off" "$([[ -f $HOME/.local/state/omarchy/toggles/bar-off ]] && echo on || echo off)"
   ck "Omarchy OSD disabled" "yes" "$(jq -r 'if ((.disabledPlugins//[])|index("omarchy.osd")) then "yes" else "no" end' "$HOME/.config/omarchy/shell.json")"
   ck "Omarchy notifications disabled" "yes" "$(jq -r 'if ((.disabledPlugins//[])|index("omarchy.notifications")) then "yes" else "no" end' "$HOME/.config/omarchy/shell.json")"
   ck "notification bus owner" "$HOME/.local/share/caelestia-shell/qs" "$(busctl --user status org.freedesktop.Notifications 2>/dev/null | sed -n 's/.*-p //p')"
@@ -56,7 +56,12 @@ if [[ $mode == caelestia ]]; then
     printf '%s %-28s expect at least %-14s actual %s\n' "$mark" "$1" "$2" "${3:-<empty>}"
   }
   ck_at_least "Caelestia drawer layer" "1" "$(hyprctl layers 2>/dev/null | grep -c 'namespace: caelestia-drawers')"
-  ck_at_least "Caelestia background" "1" "$(hyprctl layers 2>/dev/null | grep -c 'namespace: caelestia-background')"
+  # No background layer is correct when the user disabled Caelestia's background.
+  if [[ $(jq -r '.background.enabled // false' "$HOME/.config/caelestia/shell.json" 2>/dev/null) == "true" ]]; then
+    ck_at_least "Caelestia background" "1" "$(hyprctl layers 2>/dev/null | grep -c 'namespace: caelestia-background')"
+  else
+    ck "Caelestia background" "disabled" "disabled"
+  fi
   ck "wallpaper scheme" "dynamic" "$(jq -r '.name // ""' "$HOME/.local/state/caelestia/scheme.json" 2>/dev/null)"
   ck "SUPER + SPACE" "Caelestia launcher" "$(omarchy menu keybindings --print | sed -n 's/^SUPER + SPACE *→ *//p')"
   ck "SUPER + ESCAPE" "Caelestia power menu" "$(omarchy menu keybindings --print | sed -n 's/^SUPER + ESCAPE *→ *//p')"
