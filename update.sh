@@ -1,14 +1,12 @@
 #!/bin/bash
+#
+# Full update: resync Caelestia from the pinned upstream commit, reinstall
+# units/bridges/configs and reapply this integration (payload + setup),
+# exactly like a fresh install. Run remotely with:
+#   curl -fsSL https://raw.githubusercontent.com/ESHAYAT102/caelestia-for-omarchy/main/scripts/update.sh | sh
 
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PREFIX="$HOME/.local/share/caelestia-shell"
 
-[[ -d $PREFIX/qs ]] || {
-  printf 'Caelestia is not installed. Run ./install.sh first.\n' >&2
-  exit 1
-}
-
-"$ROOT/setup.sh"
-printf 'Updated Caelestia configuration and integration files without rebuilding.\n'
+exec "$ROOT/install.sh" --yes "$@"
