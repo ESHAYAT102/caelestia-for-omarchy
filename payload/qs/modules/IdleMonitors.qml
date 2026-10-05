@@ -16,6 +16,10 @@ Scope {
     readonly property bool hasPlayer: Players.list.some(p => p.isPlaying)
     readonly property bool isCharging: !UPower.onBattery
     readonly property bool enabled: {
+        // Manual Keep Awake suppresses all idle actions: when it is on,
+        // neither the screensaver hooks nor the lock may fire.
+        if (IdleInhibitor.enabled)
+            return false;
         // Manual override from the Keep Awake toggle wins over the
         // media-driven inhibit: the user explicitly allowed idle.
         if (IdleInhibitor.mediaOverrideOff && hasPlayer)
