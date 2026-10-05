@@ -113,6 +113,9 @@ ColumnLayout {
         text: qsTr("Update")
         inactiveColour: Colours.palette.m3primaryContainer
         inactiveOnColour: Colours.palette.m3onPrimaryContainer
-        onClicked: Quickshell.execDetached(["omarchy-launch-floating-terminal-with-presentation", "caelestia-update-all"])
+        onClicked: {
+            UpdateChecker.noteUpdateRun();
+            Quickshell.execDetached(["omarchy-launch-floating-terminal-with-presentation", "caelestia-update-all"]);
+        }
     }
 }
