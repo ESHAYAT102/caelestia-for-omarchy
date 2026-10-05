@@ -142,10 +142,14 @@ bind("ALT + F3", nil,
   "qs -p $HOME/.local/share/caelestia-shell/qs ipc call brightness set 1%-", repeat_locked)
 bind("ALT + F4", nil,
   "qs -p $HOME/.local/share/caelestia-shell/qs ipc call brightness set +1%", repeat_locked)
-bind("SUPER + PAGE_UP", nil, "omarchy-brightness-display +5%", repeat_locked)
-bind("SUPER + PAGE_DOWN", nil, "omarchy-brightness-display 5%-", repeat_locked)
-bind("SUPER + ALT + PAGE_UP", nil, "omarchy-brightness-display +1%", repeat_locked)
-bind("SUPER + ALT + PAGE_DOWN", nil, "omarchy-brightness-display 1%-", repeat_locked)
+bind("SUPER + PAGE_UP", nil,
+  "qs -p $HOME/.local/share/caelestia-shell/qs ipc call brightness set +5%", repeat_locked)
+bind("SUPER + PAGE_DOWN", nil,
+  "qs -p $HOME/.local/share/caelestia-shell/qs ipc call brightness set 5%-", repeat_locked)
+bind("SUPER + ALT + PAGE_UP", nil,
+  "qs -p $HOME/.local/share/caelestia-shell/qs ipc call brightness set +1%", repeat_locked)
+bind("SUPER + ALT + PAGE_DOWN", nil,
+  "qs -p $HOME/.local/share/caelestia-shell/qs ipc call brightness set 1%-", repeat_locked)
 
 bind(
   "SUPER + ALT + B",
