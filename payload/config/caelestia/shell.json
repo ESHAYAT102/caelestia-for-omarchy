@@ -88,7 +88,11 @@
                 "id": "microphone"
             },
             {
-                "enabled": true,
+                "enabled": false,
+                "id": "kbLayout"
+            },
+            {
+                "enabled": false,
                 "id": "lockStatus"
             },
             {
