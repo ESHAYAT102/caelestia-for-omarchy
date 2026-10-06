@@ -8,7 +8,7 @@
         { "timeout": 310, "idleAction": ["__HOME__/.config/omarchy/bridges/caelestia/caelestia-lock"] }
       ],
       "lockBeforeSleep": false,
-      "inhibitWhenAudio": false
+      "inhibitWhenAudio": true
     }
   },
   "bar": {
