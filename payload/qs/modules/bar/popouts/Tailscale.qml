@@ -37,7 +37,7 @@ ColumnLayout {
         spacing: Tokens.spacing.medium
 
         MaterialIcon {
-            text: "vpn_key"
+            text: "device_hub"
             color: root.connected ? Colours.palette.m3primary : Colours.palette.m3onSurfaceVariant
         }
 
@@ -66,13 +66,6 @@ ColumnLayout {
         }
     }
 
-    StyledText {
-        visible: root.peers.length > 0
-        text: qsTr("Machines")
-        color: Colours.palette.m3onSurface
-        font: Tokens.font.body.medium
-    }
-
     Repeater {
         model: root.peers
 
@@ -81,14 +74,18 @@ ColumnLayout {
             required property var modelData
             property bool copied
             Layout.fillWidth: true
-            implicitHeight: peerLayout.implicitHeight + Tokens.padding.medium * 2
+            implicitHeight: Math.max(peerLayout.implicitHeight, copyButton.implicitHeight) + Tokens.padding.medium * 2
             radius: Tokens.rounding.large
             color: Colours.tPalette.m3surfaceContainer
 
             RowLayout {
                 id: peerLayout
-                anchors.fill: parent
-                anchors.margins: Tokens.padding.medium
+                anchors.left: parent.left
+                anchors.right: copyButton.left
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                anchors.leftMargin: Tokens.padding.medium * 2
+                anchors.rightMargin: Tokens.spacing.medium
                 spacing: Tokens.spacing.medium
 
                 MaterialIcon {
@@ -119,22 +116,28 @@ ColumnLayout {
                     font: Tokens.font.label.small
                 }
 
-                IconButton {
-                    icon: peerRow.copied ? "check" : "content_copy"
-                    type: IconButton.Tonal
-                    isRound: true
-                    onClicked: {
-                        Quickshell.clipboardText = peerRow.modelData.ip;
-                        peerRow.copied = true;
-                        copiedTimer.restart();
-                    }
-                }
+            }
 
-                Timer {
-                    id: copiedTimer
-                    interval: 1400
-                    onTriggered: peerRow.copied = false
+            IconButton {
+                id: copyButton
+
+                anchors.right: parent.right
+                anchors.rightMargin: Tokens.padding.medium
+                anchors.verticalCenter: parent.verticalCenter
+                icon: peerRow.copied ? "check" : "content_copy"
+                type: IconButton.Tonal
+                isRound: true
+                onClicked: {
+                    Quickshell.clipboardText = peerRow.modelData.ip;
+                    peerRow.copied = true;
+                    copiedTimer.restart();
                 }
+            }
+
+            Timer {
+                id: copiedTimer
+                interval: 1400
+                onTriggered: peerRow.copied = false
             }
         }
     }

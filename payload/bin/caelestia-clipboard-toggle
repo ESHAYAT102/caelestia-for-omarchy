@@ -2,8 +2,4 @@
 
 set -euo pipefail
 
-qs -p "$HOME/.local/share/caelestia-shell/qs" ipc call drawers toggle launcher
-sleep 0.2
-if [[ $(qs -p "$HOME/.local/share/caelestia-shell/qs" ipc call drawers isOpen launcher) == 1 ]]; then
-  wtype '>clipboard '
-fi
+exec "$HOME/.local/bin/caelestia-launcher-type" '>clipboard '

@@ -10,7 +10,17 @@ Scope {
     id: root
 
     property bool launcherInterrupted
+    property string launcherMode
     readonly property bool hasFullscreen: Hypr.focusedWorkspace?.toplevels.values.some(t => t.lastIpcObject.fullscreen > 1) ?? false
+
+    Connections {
+        function onLauncherChanged(): void {
+            if (!target.launcher)
+                root.launcherMode = "";
+        }
+
+        target: ShellState.forActive()
+    }
 
     // qmllint disable unresolved-type
     CustomShortcut {
@@ -120,6 +130,36 @@ Scope {
                 screenState.dashboardTab = index;
                 screenState.dashboard = true;
             }
+        }
+
+        function toggleLauncherMode(text: string): string {
+            const screenState = ShellState.forActive();
+            const mode = text.trim();
+            if (screenState.launcher && root.launcherMode === mode) {
+                root.launcherMode = "";
+                screenState.launcher = false;
+                return "1";
+            }
+            root.launcherMode = mode;
+            screenState.launcher = true;
+            const search = ShellState.componentsForActive()?.find("launcherSearch");
+            if (!search)
+                return "0";
+            search.text = text;
+            search.forceActiveFocus();
+            return "1";
+        }
+
+        function openLauncherMode(text: string): string {
+            const screenState = ShellState.forActive();
+            root.launcherMode = text.trim();
+            screenState.launcher = true;
+            const search = ShellState.componentsForActive()?.find("launcherSearch");
+            if (!search)
+                return "0";
+            search.text = text;
+            search.forceActiveFocus();
+            return "1";
         }
 
         function togglePanel(panel: string): void {

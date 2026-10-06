@@ -3,10 +3,18 @@
 set -euo pipefail
 
 text="${1:?text required}"
-
-if [[ $(qs -p "$HOME/.local/share/caelestia-shell/qs" ipc call drawers isOpen launcher) != 1 ]]; then
-  qs -p "$HOME/.local/share/caelestia-shell/qs" ipc call drawers toggle launcher
-  sleep 0.2
+if [[ $(qs -p "$HOME/.local/share/caelestia-shell/qs" ipc call drawers isOpen launcher) == 1 ]]; then
+  if [[ $(qs -p "$HOME/.local/share/caelestia-shell/qs" ipc call drawers toggleLauncherMode "$text") == 1 ]]; then
+    exit 0
+  fi
 fi
 
-wtype -M ctrl -k a -m ctrl -k BackSpace "$text"
+for _ in {1..20}; do
+  if [[ $(qs -p "$HOME/.local/share/caelestia-shell/qs" ipc call drawers openLauncherMode "$text") == 1 ]]; then
+    exit 0
+  fi
+  sleep 0.025
+done
+
+printf 'Could not focus the Caelestia launcher search field.\n' >&2
+exit 1

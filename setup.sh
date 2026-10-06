@@ -118,6 +118,13 @@ PY
 merge_json_preserving_user "$ROOT/payload/config/caelestia/shell.json" "$HOME/.config/caelestia/shell.json"
 merge_json_preserving_user "$ROOT/payload/config/caelestia/shell-tokens.json" "$HOME/.config/caelestia/shell-tokens.json"
 
+if ! jq -e 'any(.bar.statusIcons[]?; .id == "tailscale")' "$HOME/.config/caelestia/shell.json" >/dev/null; then
+  config_tmp="$(mktemp)"
+  jq '.bar.statusIcons |= (map(if .id == "network" then [{"id":"tailscale","enabled":true}, .] else [.] end) | add)' \
+    "$HOME/.config/caelestia/shell.json" > "$config_tmp"
+  mv "$config_tmp" "$HOME/.config/caelestia/shell.json"
+fi
+
 if [[ ! -d $PREFIX/cli-src/.git ]]; then
   git clone -q "${CAELESTIA_CLI_REPO:-https://github.com/caelestia-dots/cli.git}" "$PREFIX/cli-src"
 fi
