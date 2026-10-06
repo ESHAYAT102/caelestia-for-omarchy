@@ -26,7 +26,7 @@ It clones or updates the repository at:
 ~/.config/caelestia-for-omarchy/
 ```
 
-The installer builds Caelestia and M3Shapes into `~/.local/share/caelestia-shell`, installs required dependencies, copies the customized shell payload, installs user services, and enables Caelestia mode.
+The installer builds Caelestia and M3Shapes into `~/.local/share/caelestia-shell`, installs required dependencies, syncs and installs every supported configuration from `ESHAYAT102/dotfiles`, copies the customized shell payload, installs user services, and enables Caelestia mode.
 
 To reuse an existing private build:
 
@@ -40,7 +40,7 @@ curl -fsSL https://raw.githubusercontent.com/ESHAYAT102/caelestia-for-omarchy/ma
 curl -fsSL https://raw.githubusercontent.com/ESHAYAT102/caelestia-for-omarchy/main/scripts/update.sh | sh
 ```
 
-This updates the repository checkout and reapplies all QML, configuration, keybinding, helper, hook, and service files without rebuilding Caelestia or M3Shapes.
+This updates both repository checkouts, runs the dotfiles repository's `install.sh --all`, and reapplies all Caelestia QML, configuration, keybinding overlays, helpers, hooks, and service files without rebuilding Caelestia or M3Shapes.
 
 ## Mode switching
 
@@ -85,7 +85,7 @@ curl -fsSL https://raw.githubusercontent.com/ESHAYAT102/caelestia-for-omarchy/ma
 ## Repository layout
 
 - `payload/qs/`: customized Caelestia QML files copied over the pinned upstream build.
-- `payload/config/`: Caelestia configuration and mode-specific Hyprland bindings.
+- `payload/config/`: Caelestia configuration and the overlay applied to Hyprland bindings imported from the dotfiles repository.
 - `payload/bin/`: `caelestia-on`, `caelestia-off`, mode switching, clipboard, and workspace-layout helpers.
 - `bridges/`: wallpaper, theme, notification, launch, and lock integration.
 - `systemd/user/`: Caelestia user services.

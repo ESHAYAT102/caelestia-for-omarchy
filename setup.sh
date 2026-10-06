@@ -20,6 +20,9 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PREFIX="$HOME/.local/share/caelestia-shell"
 QSDIR="$PREFIX/qs"
 STATE="$HOME/.local/state/caelestia-mode"
+DOTFILES_REPO="${DOTFILES_REPO:-https://github.com/ESHAYAT102/dotfiles.git}"
+DOTFILES_BRANCH="${DOTFILES_BRANCH:-main}"
+DOTFILES_DIR="$PREFIX/dotfiles-src"
 
 install_payload() {
   local src="$1" dst="$2" mode="${3:-644}"
@@ -55,6 +58,29 @@ for retired in \
 ; do
   rm -f "$QSDIR/$retired"
 done
+
+if [[ -d $DOTFILES_DIR/.git ]]; then
+  git -C "$DOTFILES_DIR" pull --ff-only origin "$DOTFILES_BRANCH"
+else
+  git clone --depth=1 --branch "$DOTFILES_BRANCH" "$DOTFILES_REPO" "$DOTFILES_DIR"
+fi
+
+# The dotfiles installer applies a theme after copying every config. Omarchy's
+# theme command can block while this setup is replacing its shell, and the same
+# theme is already active. Skip only that activation; all config categories and
+# theme files are still installed.
+real_omarchy="$(type -P omarchy)"
+omarchy() {
+  if [[ ${1:-} == "theme" && ${2:-} == "set" ]]; then
+    return 0
+  fi
+  "$real_omarchy" "$@"
+}
+export real_omarchy
+export -f omarchy
+bash "$DOTFILES_DIR/install.sh" --all
+unset -f omarchy
+unset real_omarchy
 
 merge_json_preserving_user() {
   local src="$1" dst="$2"
@@ -105,8 +131,14 @@ install_payload "$ROOT/thepiratefox.nullbar/Bar.qml" "$HOME/.config/omarchy/plug
 if [[ -f $HOME/.config/hypr/bindings.lua && ! -f $STATE/bindings.pre-caelestia.lua ]]; then
   cp -a "$HOME/.config/hypr/bindings.lua" "$STATE/bindings.pre-caelestia.lua"
 fi
-sed "s#/home/esh#$HOME#g" "$ROOT/payload/config/hypr/bindings.caelestia.lua" > "$STATE/bindings.caelestia.lua"
-cp -a "$ROOT/payload/config/hypr/bindings.omarchy.lua" "$STATE/bindings.omarchy.lua"
+[[ -f $DOTFILES_DIR/config/hypr/bindings.lua ]] || {
+  printf 'Dotfiles checkout has no config/hypr/bindings.lua\n' >&2
+  exit 1
+}
+sed "s#/home/esh#$HOME#g" "$DOTFILES_DIR/config/hypr/bindings.lua" > "$STATE/bindings.omarchy.lua"
+cp -a "$STATE/bindings.omarchy.lua" "$STATE/bindings.caelestia.lua"
+printf '\n' >> "$STATE/bindings.caelestia.lua"
+sed "s#/home/esh#$HOME#g" "$ROOT/payload/config/hypr/bindings.caelestia-overlay.lua" >> "$STATE/bindings.caelestia.lua"
 cp -a "$STATE/bindings.caelestia.lua" "$HOME/.config/hypr/bindings.lua"
 
 install_payload "$ROOT/hooks/theme-set.d/50-caelestia-scheme" "$HOME/.config/omarchy/hooks/theme-set.d/50-caelestia-scheme" 755

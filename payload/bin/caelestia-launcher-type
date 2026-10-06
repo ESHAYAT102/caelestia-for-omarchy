@@ -4,8 +4,9 @@ set -euo pipefail
 
 text="${1:?text required}"
 
-qs -p "$HOME/.local/share/caelestia-shell/qs" ipc call drawers toggle launcher
-sleep 0.2
-if [[ $(qs -p "$HOME/.local/share/caelestia-shell/qs" ipc call drawers isOpen launcher) == 1 ]]; then
-  wtype "$text"
+if [[ $(qs -p "$HOME/.local/share/caelestia-shell/qs" ipc call drawers isOpen launcher) != 1 ]]; then
+  qs -p "$HOME/.local/share/caelestia-shell/qs" ipc call drawers toggle launcher
+  sleep 0.2
 fi
+
+wtype -M ctrl -k a -m ctrl -k BackSpace "$text"

@@ -1,7 +1,8 @@
 #!/bin/bash
 #
-# Full update: resync Caelestia from the pinned upstream commit, reinstall
-# units/bridges/configs and reapply this integration (payload + setup),
+# Full update: resync Caelestia from the pinned upstream commit, import all
+# configs from the dotfiles repository, reinstall units/bridges/configs and
+# reapply this integration (payload + setup),
 # exactly like a fresh install. Run remotely with:
 #   curl -fsSL https://raw.githubusercontent.com/ESHAYAT102/caelestia-for-omarchy/main/scripts/update.sh | sh
 
