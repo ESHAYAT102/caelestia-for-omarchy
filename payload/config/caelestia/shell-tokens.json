@@ -9,10 +9,10 @@
             "kbLayoutWidth": 200
         },
         "dashboard": {
-            "userWidth": 213,
+            "userWidth": 232,
             "logoSize": 19,
             "uptimeSize": 19,
-            "dateTimeWidth": 69,
+            "dateTimeWidth": 78,
             "mediaWidth": 125,
             "weatherWidth": 172,
             "mediaCoverArtSize": 125,

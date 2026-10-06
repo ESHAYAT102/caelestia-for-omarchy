@@ -118,6 +118,12 @@ PY
 merge_json_preserving_user "$ROOT/payload/config/caelestia/shell.json" "$HOME/.config/caelestia/shell.json"
 merge_json_preserving_user "$ROOT/payload/config/caelestia/shell-tokens.json" "$HOME/.config/caelestia/shell-tokens.json"
 
+config_tmp="$(mktemp)"
+jq 'if .sizes.dashboard.userWidth == 213 then .sizes.dashboard.userWidth = 232 else . end
+    | if .sizes.dashboard.dateTimeWidth == 69 then .sizes.dashboard.dateTimeWidth = 78 else . end' \
+  "$HOME/.config/caelestia/shell-tokens.json" > "$config_tmp"
+mv "$config_tmp" "$HOME/.config/caelestia/shell-tokens.json"
+
 if ! jq -e 'any(.bar.statusIcons[]?; .id == "tailscale")' "$HOME/.config/caelestia/shell.json" >/dev/null; then
   config_tmp="$(mktemp)"
   jq '.bar.statusIcons |= (map(if .id == "network" then [{"id":"tailscale","enabled":true}, .] else [.] end) | add)' \
