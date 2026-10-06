@@ -1,0 +1,5 @@
+[Icon Theme]
+Name=Caelestia MacOS
+Comment=MacOS Icons with Adwaita fallback for Caelestia
+Inherits=MacOS Icons,Adwaita
+Directories=

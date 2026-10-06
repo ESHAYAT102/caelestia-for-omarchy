@@ -11,6 +11,7 @@ ConditionEnvironment=WAYLAND_DISPLAY
 
 [Service]
 Type=simple
+Environment="QT_QPA_SYSTEM_ICON_THEME=Caelestia-MacOS"
 ExecStart=%h/.config/omarchy/bridges/caelestia/caelestia-start
 # on-failure, not always: caelestia-start exits 0 when Caelestia is already
 # running, and `always` would turn that into a slow restart loop. A crash or a

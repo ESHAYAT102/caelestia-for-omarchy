@@ -34,7 +34,7 @@ install_payload() {
   exit 1
 }
 
-mkdir -p "$STATE" "$HOME/.local/bin" "$HOME/.config/caelestia" "$HOME/.config/omarchy/bridges/caelestia" "$HOME/.config/omarchy/plugins/thepiratefox.nullbar" "$HOME/.config/systemd/user"
+mkdir -p "$STATE" "$HOME/.local/bin" "$HOME/.local/share/icons/Caelestia-MacOS" "$HOME/.config/caelestia" "$HOME/.config/omarchy/bridges/caelestia" "$HOME/.config/omarchy/plugins/thepiratefox.nullbar" "$HOME/.config/systemd/user"
 
 for file in "$ROOT"/payload/bin/*; do
   install_payload "$file" "$HOME/.local/bin/$(basename "$file")" 755
@@ -125,6 +125,7 @@ python -m venv "$PREFIX/cli-venv"
 "$PREFIX/cli-venv/bin/pip" install --quiet "$PREFIX/cli-src"
 
 install_payload "$ROOT/systemd/user/caelestia-shell.service" "$HOME/.config/systemd/user/caelestia-shell.service"
+install_payload "$ROOT/payload/config/icons/Caelestia-MacOS/index.theme" "$HOME/.local/share/icons/Caelestia-MacOS/index.theme"
 install_payload "$ROOT/thepiratefox.nullbar/manifest.json" "$HOME/.config/omarchy/plugins/thepiratefox.nullbar/manifest.json"
 install_payload "$ROOT/thepiratefox.nullbar/Bar.qml" "$HOME/.config/omarchy/plugins/thepiratefox.nullbar/Bar.qml"
 

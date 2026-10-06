@@ -171,7 +171,8 @@ for f in bridges/caelestia/caelestia-start bridges/caelestia/caelestia-lock \
          bridges/caelestia/caelestia-notif-guard bridges/caelestia/omarchy-to-caelestia-scheme \
          hooks/theme-set.d/50-caelestia-scheme systemd/user/caelestia-shell.service \
          systemd/user/caelestia-notif-guard.service thepiratefox.nullbar/manifest.json \
-         thepiratefox.nullbar/Bar.qml config/caelestia/shell.json; do
+         thepiratefox.nullbar/Bar.qml config/caelestia/shell.json \
+         payload/config/icons/Caelestia-MacOS/index.theme; do
   [[ -e $ROOT/$f ]] || die "payload file missing from the repo: $f"
 done
 did "payload complete"
