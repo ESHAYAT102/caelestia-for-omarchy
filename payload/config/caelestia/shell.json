@@ -349,7 +349,8 @@
     },
     "services": {
         "audioIncrement": 0.05,
-        "useFahrenheit": false
+        "useFahrenheit": false,
+        "weatherLocation": ""
     },
     "session": {
         "commands": {

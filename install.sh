@@ -298,8 +298,14 @@ else
   battery=false; say "   no battery — leaving the battery status icon off"
 fi
 tmpcfg="$(mktemp)"
+weather_location=""
+if [[ -f $CAELESTIA_CONFIG/shell.json ]]; then
+  weather_location="$(jq -r '.services.weatherLocation // empty' "$CAELESTIA_CONFIG/shell.json" 2>/dev/null || true)"
+fi
 sed "s#__HOME__#$HOME#g" "$ROOT/config/caelestia/shell.json" \
-  | jq --argjson b "$battery" '(.bar.statusIcons[] | select(.id=="battery")).enabled = $b' > "$tmpcfg" \
+  | jq --argjson b "$battery" --arg location "$weather_location" \
+    '(.bar.statusIcons[] | select(.id=="battery")).enabled = $b
+    | .services.weatherLocation = $location' > "$tmpcfg" \
   || die "could not render config/caelestia/shell.json"
 # Compare as JSON, not as bytes. jq reformats, so a byte compare would rewrite
 # a semantically identical file on every re-run and leave a .bak behind.

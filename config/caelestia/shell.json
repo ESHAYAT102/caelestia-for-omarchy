@@ -23,6 +23,6 @@
       { "id": "battery",    "enabled": false }
     ]
   },
-  "services": { "useFahrenheit": false },
+  "services": { "useFahrenheit": false, "weatherLocation": "" },
   "appearance": { "font": { "body": { "small": { "size": 15 } } } }
 }
