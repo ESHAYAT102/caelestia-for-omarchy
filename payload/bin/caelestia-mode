@@ -65,7 +65,7 @@ case "$mode" in
         .bar.id = "thepiratefox.nullbar"
       | .idle.screensaver = 300
       | .idle.lock = 86400
-      | .disabledPlugins = (((.disabledPlugins // []) + ["omarchy.osd", "omarchy.notifications", "esh.notification-center"]) | unique)
+      | .disabledPlugins = (((.disabledPlugins // []) + ["omarchy.osd", "esh.osd", "omarchy.notifications", "esh.notification-center"]) | unique)
     '
 
     omarchy restart shell >/dev/null 2>&1 || true
@@ -95,7 +95,7 @@ case "$mode" in
         del(.bar.id)
       | .idle.screensaver = 150
       | .idle.lock = 300
-      | .disabledPlugins = ((((.disabledPlugins // []) + ["omarchy.osd", "omarchy.notifications"]) - ["esh.notification-center"]) | unique)
+      | .disabledPlugins = ((((.disabledPlugins // []) + ["omarchy.osd", "omarchy.notifications"]) - ["esh.notification-center", "esh.osd"]) | unique)
       | if (.disabledPlugins | length) == 0 then del(.disabledPlugins) else . end
     '
 

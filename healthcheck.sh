@@ -50,6 +50,7 @@ if [[ $mode == caelestia ]]; then
   ck "bar plugin" "thepiratefox.nullbar" "$(jq -r '.bar.id // ""' "$HOME/.config/omarchy/shell.json")"
   ck "bar-off toggle" "off" "$([[ -f $HOME/.local/state/omarchy/toggles/bar-off ]] && echo on || echo off)"
   ck "Omarchy OSD disabled" "yes" "$(jq -r 'if ((.disabledPlugins//[])|index("omarchy.osd")) then "yes" else "no" end' "$HOME/.config/omarchy/shell.json")"
+  ck "Custom OSD disabled" "yes" "$(jq -r 'if ((.disabledPlugins//[])|index("esh.osd")) then "yes" else "no" end' "$HOME/.config/omarchy/shell.json")"
   ck "Omarchy notifications disabled" "yes" "$(jq -r 'if ((.disabledPlugins//[])|index("omarchy.notifications")) then "yes" else "no" end' "$HOME/.config/omarchy/shell.json")"
   ck "notification bus owner" "$HOME/.local/share/caelestia-shell/qs" "$(busctl --user status org.freedesktop.Notifications 2>/dev/null | sed -n 's/.*-p //p')"
   ck_at_least() { # ck_at_least <label> <min> <actual>

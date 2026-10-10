@@ -153,7 +153,7 @@ else
       del(.bar.id)
     | .idle.screensaver = 150
     | .idle.lock = 300
-    | .disabledPlugins = ((.disabledPlugins // []) - ["omarchy.osd", "omarchy.notifications", "esh.notification-center"])
+    | .disabledPlugins = ((.disabledPlugins // []) - ["omarchy.osd", "omarchy.notifications", "esh.notification-center", "esh.osd"])
     | if (.disabledPlugins | length) == 0 then del(.disabledPlugins) else . end
   ' "$OMARCHY_SHELL_JSON")" || err "jq failed on $OMARCHY_SHELL_JSON"
   if [[ -n ${reverted:-} ]]; then

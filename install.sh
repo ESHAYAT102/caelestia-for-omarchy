@@ -344,7 +344,7 @@ else
     | .bar.position = "left"
     | .idle.screensaver = 300
     | .idle.lock = 86400
-    | .disabledPlugins = (((.disabledPlugins // []) + ["omarchy.osd", "omarchy.notifications", "esh.notification-center"]) | unique)
+    | .disabledPlugins = (((.disabledPlugins // []) + ["omarchy.osd", "esh.osd", "omarchy.notifications", "esh.notification-center"]) | unique)
   ' "$OMARCHY_SHELL_JSON")" || err "jq failed on $OMARCHY_SHELL_JSON"
   if [[ -n ${merged:-} ]]; then
     if [[ $merged == "$(cat "$OMARCHY_SHELL_JSON")" ]]; then
