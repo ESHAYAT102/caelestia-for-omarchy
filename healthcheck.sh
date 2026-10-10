@@ -51,6 +51,7 @@ if [[ $mode == caelestia ]]; then
   ck "bar-off toggle" "off" "$([[ -f $HOME/.local/state/omarchy/toggles/bar-off ]] && echo on || echo off)"
   ck "Omarchy OSD disabled" "yes" "$(jq -r 'if ((.disabledPlugins//[])|index("omarchy.osd")) then "yes" else "no" end' "$HOME/.config/omarchy/shell.json")"
   ck "Custom OSD disabled" "yes" "$(jq -r 'if ((.disabledPlugins//[])|index("esh.osd")) then "yes" else "no" end' "$HOME/.config/omarchy/shell.json")"
+  ck "Distinct binding profiles" "yes" "$(cmp -s "$HOME/.local/state/caelestia-mode/bindings.caelestia.lua" "$HOME/.local/state/caelestia-mode/bindings.omarchy.lua" && echo no || echo yes)"
   ck "Omarchy notifications disabled" "yes" "$(jq -r 'if ((.disabledPlugins//[])|index("omarchy.notifications")) then "yes" else "no" end' "$HOME/.config/omarchy/shell.json")"
   ck "notification bus owner" "$HOME/.local/share/caelestia-shell/qs" "$(busctl --user status org.freedesktop.Notifications 2>/dev/null | sed -n 's/.*-p //p')"
   ck_at_least() { # ck_at_least <label> <min> <actual>
@@ -70,6 +71,9 @@ if [[ $mode == caelestia ]]; then
   ck "SUPER + SPACE" "Caelestia launcher" "$(omarchy menu keybindings --print | sed -n 's/^SUPER + SPACE *→ *//p')"
   ck "SUPER + ESCAPE" "Caelestia power menu" "$(omarchy menu keybindings --print | sed -n 's/^SUPER + ESCAPE *→ *//p')"
   ck "SUPER + V" "Caelestia clipboard" "$(omarchy menu keybindings --print | sed -n 's/^SUPER + V *→ *//p')"
+  for binding in 'Caelestia emoji picker' 'Wi-Fi panel' 'Tailscale panel' 'Sidebar' 'Clear all Caelestia notifications' 'Brightness up'; do
+    ck "$binding binding" "present" "$(grep -Fq "\"$binding\"" "$HOME/.config/hypr/bindings.lua" && echo present || echo missing)"
+  done
   ck "SUPER + ALT + SPACE" "Confetti" "$(omarchy menu keybindings --print | sed -n 's/^SUPER ALT + SPACE *→ *//p')"
 else
   echo

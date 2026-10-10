@@ -158,6 +158,7 @@ sed "s#/home/esh#$HOME#g" "$DOTFILES_DIR/config/hypr/bindings.lua" > "$STATE/bin
 cp -a "$STATE/bindings.omarchy.lua" "$STATE/bindings.caelestia.lua"
 printf '\n' >> "$STATE/bindings.caelestia.lua"
 sed "s#/home/esh#$HOME#g" "$ROOT/payload/config/hypr/bindings.caelestia-overlay.lua" >> "$STATE/bindings.caelestia.lua"
+install_payload "$ROOT/payload/config/hypr/bindings.caelestia-overlay.lua" "$PREFIX/bindings.caelestia-overlay.lua"
 cp -a "$STATE/bindings.caelestia.lua" "$HOME/.config/hypr/bindings.lua"
 
 install_payload "$ROOT/hooks/theme-set.d/50-caelestia-scheme" "$HOME/.config/omarchy/hooks/theme-set.d/50-caelestia-scheme" 755

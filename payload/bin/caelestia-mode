@@ -25,6 +25,7 @@ state_dir="$HOME/.local/state/caelestia-mode"
 mode_file="$state_dir/mode"
 bindings_caelestia="$state_dir/bindings.caelestia.lua"
 bindings_omarchy="$state_dir/bindings.omarchy.lua"
+bindings_overlay="$HOME/.local/share/caelestia-shell/bindings.caelestia-overlay.lua"
 
 fail() {
   printf 'caelestia-%s: %s\n' "$mode" "$*" >&2
@@ -58,6 +59,10 @@ mkdir -p "$state_dir"
 
 case "$mode" in
   on)
+    if [[ -f $bindings_overlay && -f $bindings_omarchy ]] &&
+       ! grep -q 'Caelestia launcher' "$bindings_caelestia" 2>/dev/null; then
+      { cat "$bindings_omarchy"; printf '\n'; cat "$bindings_overlay"; } > "$bindings_caelestia"
+    fi
     [[ -e $bindings_caelestia ]] || cp -a "$bindings" "$bindings_caelestia"
     cp -a "$bindings_caelestia" "$bindings"
 
@@ -75,7 +80,7 @@ case "$mode" in
     systemctl --user restart "$unit"
     wait_for_caelestia
     sleep 0.5
-    owner="$(busctl --user status org.freedesktop.Notifications 2>/dev/null | sed -n 's/^CommandLine=//p')"
+    owner="$(busctl --user status org.freedesktop.Notifications 2>/dev/null | sed -n 's/^CommandLine=//p' || true)"
     if [[ $owner != *"$HOME/.local/share/caelestia-shell/qs"* ]]; then
       systemctl --user restart "$unit"
       wait_for_caelestia
