@@ -33,7 +33,7 @@ Singleton {
     function setVolume(newVolume: real): void {
         if (sink?.ready && sink?.audio) {
             sink.audio.muted = false;
-            sink.audio.volume = Math.max(0, Math.min(GlobalConfig.services.maxVolume, newVolume));
+            sink.audio.volume = Math.max(0, Math.min(1, newVolume));
         }
     }
 
@@ -48,7 +48,7 @@ Singleton {
     function setSourceVolume(newVolume: real): void {
         if (source?.ready && source?.audio) {
             source.audio.muted = false;
-            source.audio.volume = Math.max(0, Math.min(GlobalConfig.services.maxVolume, newVolume));
+            source.audio.volume = Math.max(0, Math.min(1, newVolume));
         }
     }
 
