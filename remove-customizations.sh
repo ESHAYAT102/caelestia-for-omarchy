@@ -15,6 +15,7 @@ fi
 rm -f "$HOME/.local/bin/caelestia-mode" \
       "$HOME/.local/bin/caelestia-on" \
       "$HOME/.local/bin/caelestia-off" \
+      "$HOME/.local/bin/caelestia-confetti" \
       "$HOME/.local/bin/caelestia-workspace-layout-toggle" \
       "$HOME/.local/bin/caelestia-clipboard-toggle"
 rm -f "$HOME/.config/omarchy/hooks/theme-set.d/50-caelestia-scheme"

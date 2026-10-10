@@ -36,6 +36,8 @@ install_payload() {
 
 mkdir -p "$STATE" "$HOME/.local/bin" "$HOME/.local/share/icons/Caelestia-MacOS" "$HOME/.config/caelestia" "$HOME/.config/omarchy/bridges/caelestia" "$HOME/.config/omarchy/plugins/thepiratefox.nullbar" "$HOME/.config/systemd/user"
 
+go -C "$ROOT" build -o "$HOME/.local/bin/caelestia-confetti" ./cmd/caelestia-confetti
+
 for file in "$ROOT"/payload/bin/*; do
   install_payload "$file" "$HOME/.local/bin/$(basename "$file")" 755
 done
@@ -55,6 +57,8 @@ done < <(find "$ROOT/payload/qs" -type f -print0)
 # prefix and can shadow the replacement (e.g. the old AppItem.qml vs items/).
 for retired in \
   "modules/launcher/AppItem.qml" \
+  "modules/confetti/Wrapper.qml" \
+  "services/Confetti.qml" \
 ; do
   rm -f "$QSDIR/$retired"
 done
@@ -138,6 +142,7 @@ python -m venv "$PREFIX/cli-venv"
 "$PREFIX/cli-venv/bin/pip" install --quiet "$PREFIX/cli-src"
 
 install_payload "$ROOT/systemd/user/caelestia-shell.service" "$HOME/.config/systemd/user/caelestia-shell.service"
+install_payload "$ROOT/systemd/user/caelestia-confetti.service" "$HOME/.config/systemd/user/caelestia-confetti.service"
 install_payload "$ROOT/payload/config/icons/Caelestia-MacOS/index.theme" "$HOME/.local/share/icons/Caelestia-MacOS/index.theme"
 install_payload "$ROOT/thepiratefox.nullbar/manifest.json" "$HOME/.config/omarchy/plugins/thepiratefox.nullbar/manifest.json"
 install_payload "$ROOT/thepiratefox.nullbar/Bar.qml" "$HOME/.config/omarchy/plugins/thepiratefox.nullbar/Bar.qml"
@@ -162,6 +167,7 @@ if [[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]]; then
   hyprctl reload >/dev/null 2>&1 || true
 fi
 systemctl --user daemon-reload >/dev/null 2>&1 || true
+systemctl --user enable --now caelestia-confetti.service >/dev/null 2>&1 || true
 if [[ -f $HOME/.config/systemd/user/caelestia-shell.service ]]; then
   "$HOME/.local/bin/caelestia-on" || true
 fi

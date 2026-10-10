@@ -57,8 +57,8 @@ readonly M3SHAPES_REF="32ad9ce328bb77ed349b40a3be10ee9ea610b8ab"
 # --- packages ----------------------------------------------------------------
 # Build tooling plus the libraries Caelestia's C++ plugin links. `--needed`
 # throughout, so anything Omarchy already ships is a no-op.
-readonly PKGS_BUILD=(cmake ninja meson autoconf-archive)
-readonly PKGS_LIB=(aubio libqalculate ttf-material-symbols-variable ttf-cascadia-code-nerd)
+readonly PKGS_BUILD=(cmake ninja meson autoconf-archive go)
+readonly PKGS_LIB=(aubio libqalculate gtk4-layer-shell ttf-material-symbols-variable ttf-cascadia-code-nerd)
 # Present on a stock Omarchy 4 box, listed so a leaner install still builds.
 # qt6-shadertools is a hard requirement of both CMake projects.
 readonly PKGS_ASSUMED=(qt6-shadertools qt6-imageformats ddcutil brightnessctl lm_sensors)
@@ -170,6 +170,7 @@ did "none of the forbidden packages are installed"
 for f in bridges/caelestia/caelestia-start bridges/caelestia/caelestia-lock \
          bridges/caelestia/caelestia-notif-guard bridges/caelestia/omarchy-to-caelestia-scheme \
          hooks/theme-set.d/50-caelestia-scheme systemd/user/caelestia-shell.service \
+         systemd/user/caelestia-confetti.service \
          systemd/user/caelestia-notif-guard.service thepiratefox.nullbar/manifest.json \
          thepiratefox.nullbar/Bar.qml config/caelestia/shell.json \
          payload/config/icons/Caelestia-MacOS/index.theme; do
@@ -283,6 +284,7 @@ install_file "$ROOT/bridges/caelestia/caelestia-lock"              "$BRIDGE_DIR/
 install_file "$ROOT/bridges/caelestia/omarchy-to-caelestia-scheme" "$BRIDGE_DIR/omarchy-to-caelestia-scheme" 755
 install_file "$ROOT/hooks/theme-set.d/50-caelestia-scheme"         "$THEME_HOOK"                             755
 install_file "$ROOT/systemd/user/caelestia-shell.service"          "$UNIT_DIR/caelestia-shell.service"
+install_file "$ROOT/systemd/user/caelestia-confetti.service"       "$UNIT_DIR/caelestia-confetti.service"
 install_file "$ROOT/systemd/user/caelestia-notif-guard.service"    "$UNIT_DIR/caelestia-notif-guard.service"
 install_file "$ROOT/thepiratefox.nullbar/manifest.json"            "$NULLBAR_DIR/manifest.json"
 install_file "$ROOT/thepiratefox.nullbar/Bar.qml"                  "$NULLBAR_DIR/Bar.qml"
@@ -491,6 +493,7 @@ else
   ck "bar-off toggle" "off" "$([[ -f $HOME/.local/state/omarchy/toggles/bar-off ]] && echo on || echo off)"
   ck_at_least "caelestia drawers" "1" "$(hyprctl layers 2>/dev/null | grep -c 'namespace: caelestia-drawers')"
   ck "caelestia-shell.service" "active" "$(systemctl --user is-active caelestia-shell.service 2>&1)"
+  ck "caelestia-confetti.service" "active" "$(systemctl --user is-active caelestia-confetti.service 2>&1)"
 fi
 
 # -----------------------------------------------------------------------------

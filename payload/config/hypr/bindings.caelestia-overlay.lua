@@ -50,7 +50,7 @@ caelestia_bind("SUPER + SHIFT + RETURN", "Alternative Terminal", "terax")
 caelestia_bind("SUPER + I", "Settings",
   "qs -p $HOME/.local/share/caelestia-shell/qs ipc call nexus open")
 caelestia_bind("SUPER + ALT + SPACE", "Confetti",
-  "qs -p $HOME/.local/share/caelestia-shell/qs ipc call toaster info Confetti '🎉' celebration")
+  "$HOME/.local/bin/caelestia-confetti fire")
 
 caelestia_bind("ALT + XF86AudioRaiseVolume", nil,
   "qs -p $HOME/.local/share/caelestia-shell/qs ipc call audio raise", caelestia_repeat_locked)

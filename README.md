@@ -8,6 +8,8 @@ A complete Caelestia desktop-shell integration for Omarchy 4 without replacing O
 - Omarchy wallpaper, Plymouth unlock screens, package tools, screenshots, clipboard history, and system utilities.
 - Native launcher clipboard history with `Delete` for one entry and `Shift+Delete` for all entries.
 - Native launcher wallpaper and Omarchy unlock-screen pickers.
+- Native Go confetti overlay with queued multi-monitor bursts.
+- Nexus navigation and About page show the discovered Omarchy plugin count.
 - Caelestia Wi-Fi, Bluetooth, Audio, Battery, Utilities, Sidebar, and power panels.
 - `caelestia-on` and `caelestia-off` switch the shell, bar, OSD, idle behavior, services, and complete keybinding profile.
 - Keeps all packaged Omarchy files under `/usr/share/omarchy` untouched.
@@ -65,6 +67,7 @@ caelestia-mode status
 | `SUPER + ESCAPE` | Caelestia power menu |
 | `SUPER + L` | Caelestia lock screen |
 | `SUPER + CTRL + L` | Toggle workspace layout |
+| `SUPER + ALT + SPACE` | Confetti |
 | `SUPER + CTRL + W/B/A` | Wi-Fi / Bluetooth / Audio panels |
 | `SUPER + ALT + B` | Battery panel |
 

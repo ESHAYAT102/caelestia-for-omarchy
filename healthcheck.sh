@@ -37,6 +37,9 @@ echo "── mode ────────────────────�
 ck "mode command" "$mode" "$(caelestia-mode status 2>&1)"
 ck "hypr config errors" "(none)" "$(hyprctl configerrors 2>/dev/null | head -1 | grep -q . && hyprctl configerrors | head -1 || echo '(none)')"
 ck "omarchy shell IPC" "ok" "$(omarchy-shell shell ping 2>&1)"
+ck "Confetti unit" "active" "$(systemctl --user is-active caelestia-confetti.service 2>&1)"
+ck "Confetti enabled" "enabled" "$(systemctl --user is-enabled caelestia-confetti.service 2>&1)"
+ck "Confetti layer" "1" "$(hyprctl layers 2>/dev/null | grep -c 'namespace: omarchy-confetti')"
 
 if [[ $mode == caelestia ]]; then
   echo
@@ -66,6 +69,7 @@ if [[ $mode == caelestia ]]; then
   ck "SUPER + SPACE" "Caelestia launcher" "$(omarchy menu keybindings --print | sed -n 's/^SUPER + SPACE *→ *//p')"
   ck "SUPER + ESCAPE" "Caelestia power menu" "$(omarchy menu keybindings --print | sed -n 's/^SUPER + ESCAPE *→ *//p')"
   ck "SUPER + V" "Caelestia clipboard" "$(omarchy menu keybindings --print | sed -n 's/^SUPER + V *→ *//p')"
+  ck "SUPER + ALT + SPACE" "Confetti" "$(omarchy menu keybindings --print | sed -n 's/^SUPER ALT + SPACE *→ *//p')"
 else
   echo
   echo "── Omarchy mode ────────────────────────────────────────────────────────"
