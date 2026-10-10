@@ -95,7 +95,7 @@ case "$mode" in
         del(.bar.id)
       | .idle.screensaver = 150
       | .idle.lock = 300
-      | .disabledPlugins = ((.disabledPlugins // []) - ["omarchy.osd", "omarchy.notifications", "esh.notification-center"])
+      | .disabledPlugins = ((((.disabledPlugins // []) + ["omarchy.osd", "omarchy.notifications"]) - ["esh.notification-center"]) | unique)
       | if (.disabledPlugins | length) == 0 then del(.disabledPlugins) else . end
     '
 
