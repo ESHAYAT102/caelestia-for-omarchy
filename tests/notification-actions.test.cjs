@@ -1,0 +1,27 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const vm = require('node:vm');
+const context = vm.createContext({});
+vm.runInContext(fs.readFileSync(`${__dirname}/../payload/qs/services/NotificationActions.js`, 'utf8'), context);
+const { parseExecArgv, buildActions } = context;
+for (const value of [undefined, '', '{', '{}', '[]', '[1]', '["notify",null]', '[""]', '["-bad"]', '["a\\u0000b"]'])
+    assert.equal(parseExecArgv(value), null);
+const argv = ['printf', '%s', 'spaces; $(literal)', '--', 'line\nbreak'];
+assert.equal(JSON.stringify(parseExecArgv(JSON.stringify(argv))), JSON.stringify(argv));
+let executed;
+const activate = args => executed = Array.from(args);
+assert.equal(buildActions([], '', activate, 'Activate').length, 0);
+const restored = buildActions([], JSON.stringify(argv), activate, 'Activate');
+assert.equal(restored[0].identifier, 'default');
+assert.equal(restored[0].text, 'Activate');
+restored[0].invoke();
+assert.deepEqual(executed, argv);
+let invoked = 0;
+const native = { identifier: 'default', text: 'Open', invoke: () => invoked++ };
+const actions = buildActions([native], JSON.stringify(argv), activate, 'Activate');
+assert.equal(actions.length, 1);
+actions[0].invoke();
+assert.equal(invoked, 1);
+const other = buildActions([{ ...native, identifier: 'reply' }], JSON.stringify(argv), activate, 'Activate');
+assert.equal(other.length, 2);
+console.log('Notification action checks passed.');

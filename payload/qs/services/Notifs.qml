@@ -70,7 +70,8 @@ Singleton {
                     urgency: n.urgency,
                     resident: n.resident,
                     hasActionIcons: n.hasActionIcons,
-                    actions: n.actions
+                    execArgv: n.execArgv,
+                    actions: []
                 }))))
     }
 

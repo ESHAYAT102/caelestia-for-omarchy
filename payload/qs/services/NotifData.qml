@@ -7,6 +7,7 @@ import Caelestia
 import Caelestia.Config
 import qs.services
 import qs.utils
+import "NotificationActions.js" as NotificationActions
 
 QtObject {
     id: notif
@@ -32,6 +33,7 @@ QtObject {
     property string appIcon
     property string appName
     property string image
+    property string execArgv
     property var hints // Hints are not persisted across restarts
     property real expireTimeout: GlobalConfig.notifs.defaultExpireTimeout
     property int urgency: NotificationUrgency.Normal
@@ -153,20 +155,24 @@ QtObject {
         }
 
         function onActionsChanged(): void {
-            // qmllint disable unresolved-type
-            notif.actions = notif.notification.actions.map(a => ({
-                        // qmllint enable unresolved-type
-                        identifier: a.identifier,
-                        text: a.text,
-                        invoke: () => a.invoke()
-                    }));
+            notif.updateActions();
         }
 
         function onHintsChanged(): void {
             notif.hints = notif.notification.hints;
+            notif.updateActions();
         }
 
         target: notif.notification
+    }
+
+    function updateActions(): void {
+        if (notification)
+            execArgv = hints?.["omarchy-exec-argv"] ?? "";
+        actions = NotificationActions.buildActions(notification?.actions ?? [], execArgv, argv => {
+            Quickshell.execDetached(argv);
+            close();
+        }, qsTr("Activate"));
     }
 
     function updateTimeStr(): void {
@@ -218,8 +224,10 @@ QtObject {
     }
 
     Component.onCompleted: {
-        if (!notification)
+        if (!notification) {
+            updateActions();
             return;
+        }
 
         notificationId = notification.id;
         summary = notification.summary;
@@ -233,12 +241,6 @@ QtObject {
         urgency = notification.urgency;
         resident = notification.resident;
         hasActionIcons = notification.hasActionIcons;
-        // qmllint disable unresolved-type
-        actions = notification.actions.map(a => ({
-                    // qmllint enable unresolved-type
-                    identifier: a.identifier,
-                    text: a.text,
-                    invoke: () => a.invoke()
-                }));
+        updateActions();
     }
 }
