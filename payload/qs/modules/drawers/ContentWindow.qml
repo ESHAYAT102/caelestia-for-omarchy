@@ -16,6 +16,13 @@ import qs.modules.bar
 StyledWindow {
     id: root
 
+    function neck(offset: real, drawer: string): real {
+        if (!Motion.neck || !Motion.forDrawer(drawer))
+            return 0;
+        const t = Math.max(0, Math.min(1, offset));
+        return 4 * t * (1 - t);
+    }
+
     readonly property alias bar: bar
     readonly property alias interactionWrapper: interactions
 
@@ -160,7 +167,17 @@ StyledWindow {
             id: blobGroup
 
             color: root.surfaceColour
-            smoothing: root.contentItem.Config.border.smoothing
+            // Thicken the existing SDF join while a spring-driven drawer is
+            // halfway out. The extra blend vanishes at either resting state.
+            smoothing: root.contentItem.Config.border.smoothing + 16 * Math.max(
+                root.neck(panels.dashboard.offsetScale, "dashboard"),
+                root.neck(panels.launcher.offsetScale, "launcher"),
+                root.neck(panels.sidebar.offsetScale, "sidebar"),
+                root.neck(panels.session.offsetScale, "session"),
+                root.neck(panels.utilities.offsetScale, "utilities"),
+                root.neck(panels.osd.offsetScale, "osd"),
+                root.neck(panels.popoutsWrapper.offsetScale, "popouts")
+            )
         }
 
         BlobInvertedRect {
@@ -177,6 +194,7 @@ StyledWindow {
             id: dashBg
 
             panel: panels.dashboard
+            motionName: "dashboard"
             deformAmount: 0.1
         }
 
@@ -184,6 +202,7 @@ StyledWindow {
             id: launcherBg
 
             panel: panels.launcher
+            motionName: "launcher"
             deformAmount: 0.1
         }
 
@@ -199,6 +218,8 @@ StyledWindow {
             id: sessionBg
 
             panel: panels.sessionWrapper
+            motionName: "session"
+            motionProgress: panels.session.offsetScale
             deformAmount: 0.2
             x: panels.sessionWrapper.x + panels.session.x + bar.implicitWidth
             implicitWidth: panels.session.width
@@ -208,6 +229,7 @@ StyledWindow {
             id: sidebarBg
 
             panel: panels.sidebar
+            motionName: "sidebar"
             deformAmount: 0.03
             implicitHeight: panel.height * (1 / rawDeformMatrix.m22) + 2
             exclude: panels.sidebar.offsetScale > 0.08 ? [] : [utilsBg]
@@ -218,6 +240,8 @@ StyledWindow {
             id: osdBg
 
             panel: panels.osdWrapper
+            motionName: "osd"
+            motionProgress: panels.osd.offsetScale
             deformAmount: 0.25
             x: panels.osdWrapper.x + panels.osd.x + bar.implicitWidth
             implicitWidth: panels.osd.width
@@ -233,6 +257,7 @@ StyledWindow {
             id: utilsBg
 
             panel: panels.utilities
+            motionName: "utilities"
             deformAmount: panels.sidebar.visible ? 0.1 : 0.15
             exclude: panels.sidebar.offsetScale > 0.08 ? [] : [sidebarBg]
             topLeftRadius: Math.max(0, Math.min(1, panels.sidebar.offsetScale / 0.3)) * radius
@@ -241,6 +266,8 @@ StyledWindow {
         PanelBg {
             id: popoutBg
 
+            motionName: "popouts"
+            motionProgress: panels.popoutsWrapper.offsetScale
             // Extra width to prevent vertical movement deformation partially detaching panel from bar
             property real extraWidth: panels.popouts.isDetached ? 0 : 0.2
 
@@ -344,13 +371,15 @@ StyledWindow {
     component PanelBg: BlobRect {
         required property Item panel
         property real deformAmount: 0.15
+        property string motionName
+        property real motionProgress: panel.offsetScale ?? 0
 
         group: panel.visible && panel.width > 1 && panel.height > 1 ? blobGroup : null
         x: panel.x + bar.implicitWidth
         y: panel.y + root.borderThickness
         implicitWidth: panel.width
         implicitHeight: panel.height
-        radius: Tokens.rounding.extraLarge
-        deformScale: (deformAmount * Config.appearance.deformScale) / 10000
+        radius: Tokens.rounding.extraLarge * (1 + (Motion.rounding && motionName !== "" ? 0.6 * root.neck(motionProgress, motionName) : 0))
+        deformScale: (motionName === "" || Motion.forDrawer(motionName) ? deformAmount * Config.appearance.deformScale : 0) / 10000
     }
 }

@@ -14,6 +14,8 @@ A complete Caelestia desktop-shell integration for Omarchy 4 without replacing O
 - `caelestia-on` and `caelestia-off` switch the shell, bar, OSD, idle behavior, services, and complete keybinding profile.
 - Keeps all packaged Omarchy files under `/usr/share/omarchy` untouched.
 
+The **Motion** page in Caelestia Settings (under Appearance) controls spring presets, drawer stretch, the mid-transition blob join, rounding, and individual drawers. Click its preview to test the motion. Turning it off restores the stock drawer timing. Presets and drawer choices are saved in `~/.config/caelestia/motion.json`; the master switch uses Caelestia's appearance configuration. Omacale's glass effect is not included.
+
 ## Install
 
 Run the one-command installer:

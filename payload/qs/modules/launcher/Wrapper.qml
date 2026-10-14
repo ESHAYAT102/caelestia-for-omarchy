@@ -23,7 +23,7 @@ Item {
         return max;
     }
 
-    property real offsetScale: shouldBeActive ? 0 : 1
+    readonly property real offsetScale: motion.value
 
     onShouldBeActiveChanged: {
         if (shouldBeActive)
@@ -40,8 +40,10 @@ Item {
 
     Component.onCompleted: Qt.callLater(() => Apps)
 
-    Behavior on offsetScale {
-        Anim {}
+    LiquidOffset {
+        id: motion
+        drawerName: "launcher"
+        target: root.shouldBeActive ? 0 : 1
     }
 
     Loader {

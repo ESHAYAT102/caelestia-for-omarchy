@@ -29,6 +29,12 @@ QtObject {
             category: "appearance"
         },
         {
+            label: qsTr("Motion"),
+            icon: "water_drop",
+            description: qsTr("Drawer springs and shape"),
+            category: "appearance"
+        },
+        {
             label: qsTr("Network"),
             icon: "wifi",
             description: qsTr("Wi-Fi, ethernet, VPN"),

@@ -38,6 +38,9 @@ QtObject {
                 }
             }
         },
+        Component {
+            MotionPage {}
+        },
 
         // Connectivity
         Component {
