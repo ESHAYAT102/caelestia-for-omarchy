@@ -65,7 +65,9 @@ static void activate(GtkApplication *app, gpointer data) {
 		gtk_layer_set_layer(GTK_WINDOW(window), GTK_LAYER_SHELL_LAYER_OVERLAY);
 		gtk_layer_set_monitor(GTK_WINDOW(window), monitor);
 		gtk_layer_set_keyboard_mode(GTK_WINDOW(window), GTK_LAYER_SHELL_KEYBOARD_MODE_NONE);
-		gtk_layer_set_exclusive_zone(GTK_WINDOW(window), 0);
+		// Ignore other panels' reserved edges so the emitters sit at the
+		// physical bottom corners rather than the usable desktop corners.
+		gtk_layer_set_exclusive_zone(GTK_WINDOW(window), -1);
 		for (int edge = 0; edge < GTK_LAYER_SHELL_EDGE_ENTRY_NUMBER; edge++)
 			gtk_layer_set_anchor(GTK_WINDOW(window), edge, TRUE);
 
