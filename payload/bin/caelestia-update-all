@@ -1,8 +1,8 @@
 #!/bin/bash
 #
 # Update everything: pacman repo packages, AUR packages via yay,
-# mise-managed dev tools and all flatpaks. Each step runs interactively
-# so packages can be reviewed; the chain stops if a step fails.
+# mise-managed dev tools and all flatpaks, then run Omarchy's post-update
+# hooks. Each step runs interactively; the chain stops if a step fails.
 
 set -u
 
@@ -25,5 +25,8 @@ mise upgrade -y || exit $?
 
 step "flatpak"
 flatpak update -y || exit $?
+
+step "Omarchy post-update hooks"
+omarchy hook post-update || exit $?
 
 printf '\nAll updates finished.\n'
