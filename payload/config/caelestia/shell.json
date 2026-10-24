@@ -356,7 +356,9 @@
     "session": {
         "commands": {
             "logout": [
-                "omarchy-system-logout"
+                "omarchy",
+                "system",
+                "logout"
             ]
         },
         "enabled": true

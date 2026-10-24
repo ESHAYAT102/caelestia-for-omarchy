@@ -122,6 +122,15 @@ PY
 merge_json_preserving_user "$ROOT/payload/config/caelestia/shell.json" "$HOME/.config/caelestia/shell.json"
 merge_json_preserving_user "$ROOT/payload/config/caelestia/shell-tokens.json" "$HOME/.config/caelestia/shell-tokens.json"
 
+# Older installs preserved a command removed by Omarchy. Only replace that
+# exact legacy value so users' custom logout commands remain untouched.
+if jq -e '.session.commands.logout == ["omarchy-system-logout"]' "$HOME/.config/caelestia/shell.json" >/dev/null; then
+  config_tmp="$(mktemp)"
+  jq '.session.commands.logout = ["omarchy", "system", "logout"]' \
+    "$HOME/.config/caelestia/shell.json" > "$config_tmp"
+  mv "$config_tmp" "$HOME/.config/caelestia/shell.json"
+fi
+
 config_tmp="$(mktemp)"
 jq 'if .sizes.dashboard.userWidth == 213 then .sizes.dashboard.userWidth = 232 else . end
     | if .sizes.dashboard.dateTimeWidth == 69 then .sizes.dashboard.dateTimeWidth = 78 else . end' \
